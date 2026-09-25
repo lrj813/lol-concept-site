@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>掌上英雄联盟 · 服务体验概念站（非官方）</title>
+<link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="preconnect" href="https://miaoda.feishu.cn">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap">
+<style>
+/* ============ 基础变量与重置 ============ */
+:root{
+  --ink:#0e0b08; --ink-2:#15100a; --ink-3:#1f170e;
+  --gold:#c9a35c; --gold-bright:#e8c987; --gold-deep:#8a6d3b;
+  --crimson:#9e2b25; --blue:#3b9cc4;
+  --paper:#e8ddc7; --muted:#a99b80;
+  --serif:'Noto Serif SC','Songti SC','STSong',serif;
+  --sans:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--ink); color:var(--paper);
+  font-family:var(--sans); line-height:1.7;
+  overflow-x:hidden; -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--gold-deep); color:#fff;}
+a{color:inherit; text-decoration:none;}
+img{display:block; max-width:100%;}
+button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit;}
+.wrap{max-width:1280px; margin:0 auto; padding:0 40px;}
+
+/* 质感颗粒层 */
+.grain{position:fixed; inset:0; pointer-events:none; z-index:90; opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+/* 云纹暗纹（背景装饰） */
+.cloud-pattern{position:absolute; inset:0; opacity:.06; pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpath d='M20 60c0-8 8-14 18-14 4-8 14-10 22-6 8-4 18 0 20 8 8 0 14 6 14 12' fill='none' stroke='%23c9a35c' stroke-width='1.2'/%3E%3C/svg%3E");
+  background-size:120px 120px;}
+
+/* 烫金文字 */
+.gold-text{
+  background:linear-gradient(160deg,#f3dfae 0%,#c9a35c 45%,#8a6d3b 70%,#e8c987 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;}
+
+/* ============ 开场动画 ============ */
+#preloader{position:fixed; inset:0; z-index:200; background:var(--ink);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:26px;}
+.seal img{width:100%; height:100%; object-fit:contain; display:block;}
+.seal{width:124px; height:124px; display:flex; align-items:center; justify-content:center;
+  transform:scale(1.6); opacity:0;}
+.seal svg{width:100%; height:100%;}
+.preloader-line{font-family:var(--serif); letter-spacing:.5em; color:var(--gold); font-size:16px; opacity:0;}
+.preloader-sub{font-size:9px; letter-spacing:.45em; color:var(--gold-deep); opacity:0; margin-top:-12px;}
+
+/* ============ 顶部导航 ============ */
+header.nav{position:fixed; top:0; left:0; right:0; z-index:100;
+  transition:opacity .5s ease; border-bottom:1px solid transparent;
+  background:transparent !important; backdrop-filter:none !important;}
+header.nav.nav-hidden{opacity:0; pointer-events:none;}
+.nav-inner{display:flex; align-items:center; justify-content:space-between; height:74px;}
+.brand{display:flex; align-items:center; gap:9px; opacity:.88; transition:opacity .3s;}
+.brand img{width:38px; height:38px;}
+.brand .brand-logo{width:38px; height:38px; flex:none; mix-blend-mode:screen; filter:brightness(1.06);}
+.brand-name{font-family:var(--serif); font-weight:600; font-size:15px; letter-spacing:.14em; color:rgba(232,221,199,.88);}
+.brand-name small{display:block; font-family:var(--sans); font-weight:400; font-size:10px; letter-spacing:.28em; color:var(--muted);}
+.nav-links{display:flex; gap:30px; list-style:none;}
+.nav-links a{font-size:14px; letter-spacing:.14em; color:rgba(232,221,199,.92); position:relative;
+  padding:5px 2px; transition:color .25s; display:flex; flex-direction:column; align-items:center; gap:2px; line-height:1.2;}
+.nav-links a .en{font-size:8px; letter-spacing:.22em; color:rgba(201,163,92,.55); font-weight:300; text-transform:uppercase;}
+.nav-links a:hover .en{color:var(--gold);}
+.nav-links a::after{content:''; position:absolute; left:0; bottom:0; width:0; height:1px; background:var(--gold); transition:width .3s;}
+.nav-links a:hover{color:var(--gold-bright);} .nav-links a:hover::after{width:100%;}
+.nav-download{padding:8px 22px; border:1px solid rgba(201,163,92,.6); color:var(--gold-bright);
+  font-size:14px; letter-spacing:.16em; border-radius:2px; transition:all .35s; background:rgba(14,11,8,.25);}
+.nav-download:hover{background:var(--gold); color:var(--ink);}
+.nav-toggle{display:none;}
+
+/* ============ Hero 首屏 ============ */
+.hero{position:relative; min-height:100vh; display:flex; align-items:center; overflow:hidden;}
+.hero-bg{position:absolute; inset:0; z-index:0;}
+.hero-bg img{width:100%; height:100%; object-fit:cover; object-position:center center; opacity:.85; filter:saturate(1.05) contrast(1.08); animation:heroBreathe 9s ease-in-out infinite;}
+.hero-char{position:absolute; z-index:1; pointer-events:none; mix-blend-mode:screen;}
+.hero-char img{height:100%; width:auto; object-fit:contain; display:block;}
+.hero-char-left{left:0; bottom:0; height:95vh; opacity:.65;}
+.hero-char-right{right:-3%; bottom:0; height:88vh; opacity:.6;}
+@media(max-width:768px){
+  .hero-char-left{left:-15%; height:55vh; opacity:.25;}
+  .hero-char-right{right:-20%; height:50vh; opacity:.2;}
+}
+.hero-bg::after{content:''; position:absolute; inset:0;
+  background:linear-gradient(90deg,rgba(14,11,8,.85) 0%,rgba(14,11,8,.45) 35%,rgba(14,11,8,.15) 65%,rgba(14,11,8,.4) 100%),
+             linear-gradient(0deg,var(--ink) 2%,rgba(14,11,8,0) 45%);}
+.hero-inner{position:relative; z-index:2; width:100%; padding-top:74px; display:flex; justify-content:space-between; align-items:flex-end; gap:24px;}
+.hero-copy{max-width:640px;}
+.hero-vertical{position:absolute; left:40px; top:50%; transform:translateY(-50%);
+  writing-mode:vertical-rl; font-family:var(--serif); color:var(--gold-deep); letter-spacing:.6em; font-size:14px; z-index:3;}
+.hero-kicker{display:inline-flex; align-items:center; gap:14px; font-size:13px; letter-spacing:.35em; color:var(--gold); margin:-28px 0 26px;}
+.hero-kicker::before{content:''; width:42px; height:1px; background:var(--gold);}
+.hero h1{font-family:var(--serif); font-weight:900; font-size:clamp(44px,6.2vw,82px); line-height:1.12; letter-spacing:.04em;}
+.hero h1 .sub{display:block; font-size:.34em; font-weight:400; letter-spacing:.5em; color:var(--muted); margin-top:18px;}
+.hero-desc{margin-top:28px; max-width:480px; color:var(--muted); font-size:16px; font-weight:300;}
+.hero-cta{display:flex; gap:18px; margin-top:40px; flex-wrap:wrap;}
+.btn-primary{display:inline-flex; align-items:center; justify-content:center; gap:12px; padding:0 36px; height:52px;
+  background:linear-gradient(160deg,#d8b770,#a8843f); color:#1a1308; font-weight:700;
+  letter-spacing:.2em; font-size:15px; border-radius:2px; transition:transform .25s, box-shadow .25s;}
+.btn-primary:hover{transform:translateY(-2px); box-shadow:0 10px 30px rgba(201,163,92,.3);}
+.btn-ghost{display:inline-flex; align-items:center; justify-content:center; gap:10px; padding:0 28px; height:52px; border:1px solid rgba(232,221,199,.35);
+  color:var(--paper); letter-spacing:.2em; font-size:15px; border-radius:2px; transition:all .3s;}
+.btn-ghost:hover{border-color:var(--gold); color:var(--gold-bright);}
+.hero-scroll{position:absolute; bottom:34px; left:50%; transform:translateX(-50%); z-index:3;
+  font-size:11px; letter-spacing:.4em; color:var(--muted); display:flex; flex-direction:column; align-items:center; gap:10px;}
+.hero-scroll .line{width:1px; height:46px; background:linear-gradient(var(--gold),transparent); animation:drop 2s infinite;}
+@keyframes heroBreathe{0%,100%{transform:scale(1);} 50%{transform:scale(1.035);}}
+
+
+@keyframes drop{0%{transform:scaleY(0); transform-origin:top;} 45%{transform:scaleY(1); transform-origin:top;}
+  55%{transform:scaleY(1); transform-origin:bottom;} 100%{transform:scaleY(0); transform-origin:bottom;}}
+
+/* 手机 mockup */
+.phone{position:relative; width:300px; margin:0 auto;}
+.phone-frame{position:relative; border-radius:42px; padding:10px;
+  background:linear-gradient(150deg,#3a2f1c,#17110a 60%,#3a2f1c);
+  border:1px solid rgba(201,163,92,.4);
+  box-shadow:0 40px 90px rgba(0,0,0,.6), inset 0 0 0 2px rgba(0,0,0,.6);}
+.phone-screen{position:relative; border-radius:34px; overflow:hidden; aspect-ratio:9/19.5; background:#000;}
+.phone-screen img.shot{width:100%; height:100%; object-fit:cover; position:absolute; inset:0; opacity:0; transition:opacity .7s;}
+.phone-screen img.shot.active{opacity:1;}
+.phone-notch{position:absolute; top:16px; left:50%; transform:translateX(-50%); width:90px; height:20px;
+  background:#0a0806; border-radius:12px; z-index:5;}
+.phone-dots{display:flex; justify-content:center; gap:10px; margin-top:22px;}
+.phone-dots button{width:7px; height:7px; border-radius:50%; background:rgba(201,163,92,.3); transition:all .3s;}
+.phone-dots button.active{background:var(--gold-bright); transform:scale(1.3);}
+.phone-glow{position:absolute; inset:-40px; z-index:-1; border-radius:60px;
+  background:radial-gradient(circle at 50% 40%,rgba(201,163,92,.18),transparent 65%);}
+
+/* Hero 小下载卡（参考王者世界官网） */
+.hero-dl{position:relative; z-index:3; display:flex; align-items:center; gap:12px;
+  background:rgba(14,11,8,.72); border:1px solid rgba(201,163,92,.35); border-radius:4px;
+  padding:0 16px; height:52px; flex-shrink:0; backdrop-filter:blur(10px);}
+.hero-dl img{width:36px; height:36px; border-radius:8px;}
+.hero-dl .dl-name{font-family:var(--serif); font-weight:700; font-size:14px; letter-spacing:.1em; line-height:1.3; white-space:nowrap;}
+.hero-dl .dl-sub{font-size:10px; color:var(--muted); letter-spacing:.18em; white-space:nowrap;}
+.hero-dl .dl-btn{margin-left:8px; padding:8px 18px; background:linear-gradient(160deg,#d8b770,#a8843f);
+  color:#1a1308; font-size:12px; letter-spacing:.15em; border-radius:2px; font-weight:700; transition:transform .25s;}
+.hero-dl .dl-btn:hover{transform:translateY(-2px);}
+
+/* 全功能矩阵 */
+.more-features{padding:110px 0; background:linear-gradient(180deg,var(--ink),var(--ink-2)); position:relative;}
+.mf-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:rgba(201,163,92,.18);
+  border:1px solid rgba(201,163,92,.18); border-radius:4px; overflow:hidden;}
+.mf-item{background:var(--ink-2); padding:38px 30px; transition:background .3s; cursor:pointer; text-align:left;}
+.mf-item:hover{background:var(--ink-3);}
+.mf-item svg{width:30px; height:30px; color:var(--gold); margin-bottom:18px;}
+.mf-item h4{font-family:var(--serif); font-size:17px; font-weight:700; letter-spacing:.08em; margin-bottom:10px;}
+.mf-item p{font-size:13px; color:var(--muted); font-weight:300; line-height:1.7;}
+
+/* 英雄分类筛选 */
+.hero-filter{display:flex; justify-content:center; gap:10px; margin-bottom:50px; flex-wrap:wrap;}
+.hero-filter button{padding:9px 24px; border:1px solid rgba(201,163,92,.3); color:var(--muted);
+  font-size:13px; letter-spacing:.18em; border-radius:2px; transition:all .3s; background:transparent;}
+.hero-filter button.active,.hero-filter button:hover{border-color:var(--gold); color:var(--gold-bright); background:rgba(201,163,92,.08);}
+
+/* ============ 章节通用 ============ */
+section{position:relative;}
+.sec-head{text-align:center; margin-bottom:70px;}
+.sec-kicker{font-size:12px; letter-spacing:.5em; color:var(--gold); display:block; margin-bottom:18px;}
+.sec-title{font-family:var(--serif); font-weight:900; font-size:clamp(30px,3.6vw,46px); letter-spacing:.08em;}
+.sec-sub{margin-top:18px; color:var(--muted); font-weight:300; font-size:15px;}
+.divider{width:120px; height:18px; margin:22px auto 0;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 18'%3E%3Cpath d='M0 9h44M76 9h44' stroke='%23c9a35c' stroke-width='1'/%3E%3Cpath d='M60 2l5 7-5 7-5-7z' fill='%23c9a35c'/%3E%3C/svg%3E") center/contain no-repeat;}
+
+.reveal{opacity:0; transform:translateY(40px); transition:opacity .9s cubic-bezier(.22,1,.36,1), transform .9s cubic-bezier(.22,1,.36,1);}
+.reveal.in{opacity:1; transform:none;}
+
+/* ============ 功能画卷（横向 pin 叙事） ============ */
+#features{background:linear-gradient(180deg,var(--ink) 0%,var(--ink-2) 100%);}
+.features-pin{position:relative; overflow:hidden;}
+.features-track{display:flex; gap:6vw; padding:0 14vw; width:max-content; align-items:center;}
+.feature-card{width:72vw; max-width:920px; display:grid; grid-template-columns:.85fr 1.15fr; gap:48px; align-items:center;
+  position:relative; overflow:hidden; border:1px solid rgba(201,163,92,.22); border-radius:6px;
+  padding:56px; background:rgba(20,15,9,.6);}
+.fc-bg{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:.22; z-index:0;}
+.fc-mask{position:absolute; inset:0; z-index:1;
+  background:linear-gradient(90deg,rgba(14,11,8,.92) 0%,rgba(14,11,8,.6) 48%,rgba(14,11,8,.86) 100%);}
+.feature-card > *:not(.fc-bg):not(.fc-mask){position:relative; z-index:2;}
+.feature-card .phone{width:260px;}
+.feature-num{font-family:var(--serif); font-size:13px; letter-spacing:.4em; color:var(--gold); display:flex; align-items:center; gap:16px; margin-bottom:22px;}
+.feature-num::after{content:''; flex:1; height:1px; background:linear-gradient(90deg,var(--gold-deep),transparent);}
+.feature-card h3{font-family:var(--serif); font-weight:900; font-size:clamp(26px,2.8vw,38px); letter-spacing:.06em; line-height:1.25;}
+.feature-card p{margin-top:20px; color:var(--muted); font-weight:300; font-size:15px;}
+.feature-points{list-style:none; margin-top:26px; display:grid; grid-template-columns:1fr 1fr; gap:12px 24px;}
+.feature-points li{font-size:14px; color:var(--paper); display:flex; align-items:center; gap:10px;}
+.feature-points li svg{flex:none; color:var(--gold);}
+.features-progress{position:absolute; left:14vw; right:14vw; bottom:60px; height:2px; background:rgba(201,163,92,.18);}
+.features-progress span{display:block; height:100%; background:var(--gold); width:0;}
+.features-hint{position:absolute; right:40px; bottom:46px; font-size:11px; letter-spacing:.3em; color:var(--muted);}
+
+/* ============ 英雄资料库 ============ */
+#heroes{background:var(--ink-2);}
+.hero-grid{display:grid; grid-template-columns:repeat(10,1fr); gap:11px; max-width:1075px; margin:0 auto;}
+  @media(max-width:1120px){.hero-grid{max-width:none;}}
+.hero-cell{aspect-ratio:1/1; border:1px solid rgba(201,163,92,.2); border-radius:3px; overflow:hidden;
+  cursor:pointer; background:var(--ink-3); transition:transform .3s, border-color .3s; position:relative;}
+.hero-cell img{width:100%; height:100%; object-fit:cover; transition:transform .4s;
+  filter:saturate(1.12) contrast(1.07) brightness(1.03) url(#avatarSharpen);}
+.hero-cell:hover{border-color:var(--gold); transform:translateY(-3px);}
+.hero-cell:hover img{transform:scale(1.1);}
+.hero-cell .hname{position:absolute; left:0; right:0; bottom:0; padding:14px 4px 5px; text-align:center;
+  font-size:11px; letter-spacing:.1em; background:linear-gradient(0deg,rgba(10,8,6,.92),transparent); opacity:0; transition:opacity .3s;}
+.hero-cell:hover .hname{opacity:1;}
+.hero-cell.hide{display:none;}
+
+/* ============ 下载区 ============ */
+#download{background:linear-gradient(180deg,var(--ink-2),var(--ink)); padding:120px 0;}
+.download-box{position:relative; border:1px solid rgba(201,163,92,.35); border-radius:4px;
+  padding:70px 60px; display:grid; grid-template-columns:1fr auto 1fr; gap:50px; align-items:center;
+  background:linear-gradient(160deg,rgba(31,23,14,.9),rgba(14,11,8,.9)); overflow:hidden;}
+.download-box .cloud-pattern{opacity:.1;}
+.dl-bg{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:.14; z-index:0;}
+.dl-left{position:relative; z-index:2;}
+.dl-left h2{font-family:var(--serif); font-weight:900; font-size:clamp(28px,3vw,40px); letter-spacing:.06em;}
+.dl-left p{margin-top:18px; color:var(--muted); font-weight:300; font-size:15px; max-width:380px;}
+.dl-meta{margin-top:26px; font-size:13px; color:var(--muted); line-height:2;}
+.dl-meta b{color:var(--gold); font-weight:500;}
+.dl-qr{position:relative; z-index:2; text-align:center;}
+.dl-qr .qr-frame{padding:14px; background:var(--paper); border-radius:4px; display:inline-block;}
+.dl-qr img{width:170px; height:170px; object-fit:contain;}
+.dl-qr p{margin-top:14px; font-size:13px; letter-spacing:.25em; color:var(--gold);}
+.dl-right{position:relative; z-index:2; display:flex; flex-direction:column; gap:16px;}
+.dl-store{display:flex; align-items:center; gap:16px; border:1px solid rgba(232,221,199,.25);
+  border-radius:3px; padding:16px 22px; transition:all .3s; text-align:left;}
+.dl-store:hover{border-color:var(--gold); background:rgba(201,163,92,.08);}
+.dl-store svg{flex:none; color:var(--gold-bright);}
+.dl-store .s1{font-size:11px; color:var(--muted); display:block;}
+.dl-store .s2{font-size:17px; font-weight:700; letter-spacing:.1em;}
+
+/* ============ Footer ============ */
+footer{background:#080604; padding:70px 0 40px; border-top:1px solid rgba(201,163,92,.15);}
+.foot-grid{display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:50px;}
+.foot-brand p{margin-top:18px; color:var(--muted); font-size:13px; font-weight:300; max-width:360px;}
+.foot-col h4{font-family:var(--serif); font-size:15px; letter-spacing:.2em; color:var(--gold); margin-bottom:20px; font-weight:600;}
+.foot-col a{display:block; color:var(--muted); font-size:13px; padding:6px 0; transition:color .25s;}
+.foot-col a:hover{color:var(--gold-bright);}
+.health{margin-top:50px; padding-top:26px; border-top:1px solid rgba(201,163,92,.12);
+  text-align:center; color:#6d6351; font-size:12px; letter-spacing:.12em; line-height:2;}
+.copyright{margin-top:18px; text-align:center; color:#564e40; font-size:12px; line-height:2;}
+.copyright .disclaim{color:#7a6f5c;}
+
+/* Toast */
+#toast{position:fixed; left:50%; bottom:50px; transform:translate(-50%,30px); z-index:300;
+  background:rgba(20,15,9,.96); border:1px solid var(--gold-deep); color:var(--paper);
+  padding:14px 30px; font-size:14px; letter-spacing:.1em; border-radius:3px;
+  opacity:0; transition:opacity .35s, transform .35s; pointer-events:none;}
+#toast.show{opacity:1; transform:translate(-50%,0);}
+
+/* ============ 响应式 ============ */
+@media (max-width:1024px){
+  .hero-inner{grid-template-columns:1fr; gap:60px;}
+  .hero .phone{width:250px;}
+  .hero-vertical{display:none;}
+  .hero-grid{grid-template-columns:repeat(5,1fr);}
+  .mf-grid{grid-template-columns:repeat(2,1fr);}
+  .download-box{grid-template-columns:1fr; gap:40px; text-align:center; padding:50px 36px;}
+  .dl-left p{margin-left:auto; margin-right:auto;}
+  .dl-right{max-width:360px; width:100%; margin:0 auto; text-align:left;}
+  .foot-grid{grid-template-columns:1fr 1fr;}
+}
+@media (max-width:720px){
+  .wrap{padding:0 22px;}
+  .nav-links{display:none; position:absolute; top:74px; left:0; right:0; flex-direction:column; gap:0;
+    background:rgba(14,11,8,.97); padding:10px 22px 24px; border-bottom:1px solid rgba(201,163,92,.2);}
+  .nav-links.open{display:flex;}
+  .nav-links a{padding:14px 0; border-bottom:1px solid rgba(201,163,92,.1);}
+  .nav-links a::after{display:none;}
+  .nav-download{display:none;}
+  .nav-toggle{display:flex; flex-direction:column; gap:5px; padding:8px;}
+  .nav-toggle span{width:24px; height:2px; background:var(--gold-bright); transition:transform .3s;}
+  .nav-toggle.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+  .nav-toggle.open span:nth-child(2){opacity:0;}
+  .nav-toggle.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+  .hero{align-items:flex-start;}
+  .hero-inner{padding-top:128px !important; padding-bottom:80px; flex-direction:column; align-items:stretch;}
+  .hero h1{font-size:42px;}
+  .hero-cta .btn-primary,.hero-cta .btn-ghost{width:100%; justify-content:center;}
+  .feature-card{grid-template-columns:1fr; gap:30px; width:84vw; padding:38px 26px;}
+  .fc-mask{background:linear-gradient(0deg,rgba(14,11,8,.95),rgba(14,11,8,.6));}
+  .feature-card .phone{width:210px;}
+  .feature-points{grid-template-columns:1fr;}
+  .features-hint,.features-progress{display:none;}
+  .features-track{flex-direction:column; width:100% !important; padding:0 22px; gap:76px;}
+  .feature-card{width:100% !important; max-width:none;}
+  #featuresPin{overflow:visible;}
+  .hero-grid{grid-template-columns:repeat(4,1fr); gap:10px;}
+  .mf-grid{grid-template-columns:1fr;}
+  .hero-dl{justify-content:center; height:52px;}
+  .hero-dl .dl-btn{padding:7px 14px; font-size:11px;}
+  .foot-grid{grid-template-columns:1fr; gap:36px;}
+  .download-box{padding:40px 24px;}
+}
+@media (max-width:420px){ .hero-grid{grid-template-columns:repeat(2,1fr);} }
+
+/* reduced motion */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  .reveal{opacity:1; transform:none; transition:none;}
+  .hero-scroll .line{animation:none; background:var(--gold-deep);}
+  *{animation-duration:.01ms !important; transition-duration:.01ms !important;}
+}
+
+/* ============ 资讯中心 ============ */
+.news-section{padding:110px 0; background:linear-gradient(180deg,#0e0b08 0%,#120f0b 50%,#0e0b08 100%);}
+.news-layout{display:grid; grid-template-columns:1.45fr 1fr; gap:32px; margin-top:52px;}
+.news-main{border:1px solid rgba(201,163,92,.16); background:rgba(20,16,11,.55); border-radius:3px; overflow:hidden; display:flex; flex-direction:column;}
+.news-tabs{display:flex; border-bottom:1px solid rgba(201,163,92,.13);}
+.news-tabs button{flex:1; padding:15px 0; background:none; border:none; color:var(--muted);
+  font-family:var(--sans); font-size:14px; letter-spacing:.22em; cursor:pointer; transition:color .3s; position:relative;}
+.news-tabs button.active{color:var(--gold-bright);}
+.news-tabs button.active::after{content:''; position:absolute; bottom:-1px; left:22%; right:22%; height:2px; background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.news-list{padding:6px 22px 14px; flex:1;}
+.news-item{display:flex; align-items:center; gap:13px; padding:14px 4px; border-bottom:1px solid rgba(201,163,92,.07); cursor:pointer; transition:background .2s;}
+.news-item:last-child{border-bottom:none;}
+.news-item:hover{background:rgba(201,163,92,.04);}
+.news-item .n-tag{flex:none; padding:2px 8px; font-size:10px; letter-spacing:.12em; border-radius:2px; white-space:nowrap;}
+.n-tag.hot{background:rgba(158,43,37,.18); color:#d4605a; border:1px solid rgba(158,43,37,.38);}
+.n-tag.notice{background:rgba(201,163,92,.1); color:var(--gold); border:1px solid rgba(201,163,92,.28);}
+.n-tag.event{background:rgba(201,163,92,.06); color:#b8954f; border:1px solid rgba(201,163,92,.2);}
+.n-tag.match{background:rgba(201,163,92,.08); color:var(--gold-bright); border:1px solid rgba(201,163,92,.25);}
+.news-item .n-title{flex:1; font-size:14px; color:rgba(232,221,199,.85); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; transition:color .2s;}
+.news-item:hover .n-title{color:var(--gold-bright);}
+.news-item .n-date{flex:none; font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums;}
+.news-feature{position:relative; border-radius:3px; overflow:hidden; border:1px solid rgba(201,163,92,.16); min-height:420px; cursor:pointer;}
+.news-feature img{width:100%; height:100%; object-fit:cover; position:absolute; inset:0; transition:transform .6s ease;}
+.news-feature:hover img{transform:scale(1.05);}
+.nf-overlay{position:absolute; inset:0; background:linear-gradient(0deg,rgba(14,11,8,.96) 0%,rgba(14,11,8,.35) 55%,transparent 100%);
+  display:flex; flex-direction:column; justify-content:flex-end; padding:30px; z-index:2;}
+.nf-overlay .nf-tag{align-self:flex-start; padding:3px 10px; font-size:10px; letter-spacing:.2em;
+  background:rgba(158,43,37,.25); border:1px solid rgba(158,43,37,.5); color:#e0807a; border-radius:2px; margin-bottom:14px;}
+.nf-overlay h4{font-family:var(--serif); font-size:24px; font-weight:700; color:var(--paper); margin-bottom:8px; letter-spacing:.06em;}
+.nf-overlay p{font-size:13px; color:var(--muted); letter-spacing:.08em;}
+@media(max-width:900px){.news-layout{grid-template-columns:1fr;}.news-feature{min-height:280px;}}
+
+/* ============ 赛事专区 ============ */
+.esports-section{padding:110px 0; background:linear-gradient(180deg,#0e0b08 0%,#15110c 45%,#0e0b08 100%); position:relative; overflow:hidden;}
+.esports-section::before{content:''; position:absolute; inset:0;
+  background:radial-gradient(ellipse 50% 40% at 50% 0%, rgba(158,43,37,.08), transparent 70%); pointer-events:none;}
+.live-banner{position:relative; margin-top:52px; border:1px solid rgba(201,163,92,.2); border-radius:3px;
+  overflow:hidden; display:flex; align-items:center; justify-content:space-between; padding:26px 32px;
+  background:linear-gradient(90deg,rgba(158,43,37,.18),rgba(20,16,11,.6) 60%); cursor:pointer; transition:border-color .3s;}
+.live-banner:hover{border-color:rgba(201,163,92,.45);}
+.live-left{display:flex; align-items:center; gap:20px;}
+.live-badge{display:flex; align-items:center; gap:7px; padding:5px 13px; background:rgba(158,43,37,.85); border-radius:2px;}
+.live-badge .dot{width:7px;height:7px;border-radius:50%;background:#fff;animation:livePulse 1.4s ease-in-out infinite;}
+@keyframes livePulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.live-badge span{font-size:12px;letter-spacing:.2em;color:#fff;font-weight:600;}
+.live-match{font-family:var(--serif); font-size:20px; color:var(--paper); letter-spacing:.06em;}
+.live-match small{display:block; font-family:var(--sans); font-size:11px; color:var(--muted); letter-spacing:.15em; margin-top:3px;}
+.live-go{padding:10px 26px; border:1px solid var(--gold); color:var(--gold-bright); font-size:13px; letter-spacing:.2em; border-radius:2px; transition:all .3s;}
+.live-banner:hover .live-go{background:var(--gold); color:var(--ink);}
+.match-grid{display:grid; grid-template-columns:1.35fr 1fr; gap:32px; margin-top:32px;}
+.match-panel,.stand-panel{border:1px solid rgba(201,163,92,.15); border-radius:3px; background:rgba(20,16,11,.5); overflow:hidden;}
+.panel-head{padding:17px 24px; border-bottom:1px solid rgba(201,163,92,.12); display:flex; align-items:center; justify-content:space-between;}
+.panel-head h4{font-family:var(--serif); font-size:16px; color:var(--gold-bright); letter-spacing:.12em; font-weight:700;}
+.panel-head span{font-size:11px; color:var(--muted); letter-spacing:.15em;}
+.match-row{display:flex; align-items:center; justify-content:space-between; padding:16px 24px; border-bottom:1px solid rgba(201,163,92,.07); transition:background .2s;}
+.match-row:last-child{border-bottom:none;}
+.match-row:hover{background:rgba(201,163,92,.04);}
+.team{display:flex; align-items:center; gap:10px; font-size:14px; color:var(--paper); min-width:120px;}
+.team-logo{width:32px;height:32px;border-radius:50%; display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;letter-spacing:.02em; flex:none; border:1px solid rgba(201,163,92,.3);}
+.team.r{flex-direction:row-reverse; text-align:right;}
+.match-mid{text-align:center; flex:none; padding:0 12px;}
+.match-mid .vs{font-family:var(--serif); font-size:15px; color:var(--gold); letter-spacing:.1em;}
+.match-mid .mtime{display:block; font-size:10px; color:var(--muted); margin-top:3px; letter-spacing:.1em;}
+.stand-row{display:grid; grid-template-columns:34px 1fr 44px 44px; align-items:center; padding:12px 24px;
+  border-bottom:1px solid rgba(201,163,92,.07); font-size:13px;}
+.stand-row:last-child{border-bottom:none;}
+.stand-row.head{font-size:10px; color:var(--muted); letter-spacing:.15em; padding:10px 24px;}
+.stand-rank{font-family:var(--serif); font-size:15px; color:var(--gold); font-weight:700;}
+.stand-row:not(.head):nth-child(-n+4) .stand-rank{color:var(--gold-bright);}
+.stand-name{color:var(--paper); display:flex; align-items:center; gap:9px;}
+.stand-name .mini-logo{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:8px;font-weight:700;border:1px solid rgba(201,163,92,.25);}
+.stand-w,.stand-l{text-align:center; font-variant-numeric:tabular-nums; color:rgba(232,221,199,.8);}
+.stand-row.head .stand-w,.stand-row.head .stand-l{color:var(--muted);}
+@media(max-width:900px){.match-grid{grid-template-columns:1fr;}.live-banner{flex-direction:column;gap:18px;align-items:flex-start;}.live-go{align-self:stretch;text-align:center;}}
+
+/* ============ 体验优化：去除强制横向长滚动，改为可控画卷 ============ */
+.nav-links{gap:19px;}
+.nav-links a{font-size:13px;}
+.nav-concept{display:inline-flex;align-items:center;margin-left:10px;padding:3px 7px;border:1px solid rgba(201,163,92,.33);color:var(--gold);font-size:8px;letter-spacing:.15em;line-height:1.15;}
+.hero-kicker .concept-dot{width:5px;height:5px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px var(--gold);}
+.hero-cta .btn-primary{min-width:178px;}
+.section-note{margin:18px auto 0;max-width:660px;color:#84775f;font-size:12px;letter-spacing:.08em;line-height:1.8;}
+.features-pin{overflow:visible;padding:0 0 104px;}
+.features-track{width:auto;max-width:1280px;margin:0 auto;padding:0 40px 14px;gap:18px;align-items:stretch;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-padding:40px;scrollbar-width:thin;scrollbar-color:rgba(201,163,92,.55) rgba(201,163,92,.1);}
+.features-track::-webkit-scrollbar{height:5px;}.features-track::-webkit-scrollbar-track{background:rgba(201,163,92,.1);}.features-track::-webkit-scrollbar-thumb{background:var(--gold-deep);border-radius:4px;}
+.feature-card{width:min(82vw,430px);min-width:min(82vw,430px);max-width:none;grid-template-columns:1fr;gap:25px;padding:34px 30px;scroll-snap-align:start;}
+.feature-card .phone{width:172px;margin:0;}
+.feature-card h3{font-size:28px;}.feature-card p{font-size:14px;}.feature-points{gap:10px 18px;}.feature-points li{font-size:13px;}
+.features-progress,.features-hint{display:none;}
+.feature-controls{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:25px;}
+.feature-controls button{display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:36px;border:1px solid rgba(201,163,92,.42);color:var(--gold-bright);font-size:15px;transition:all .25s;}
+.feature-controls button:hover:not(:disabled){border-color:var(--gold);background:rgba(201,163,92,.12);}.feature-controls button:disabled{opacity:.35;cursor:not-allowed;}
+.feature-controls span{color:var(--muted);font-size:11px;letter-spacing:.2em;}
+.demo-label{display:inline-flex;align-items:center;gap:7px;padding:3px 9px;border:1px solid rgba(201,163,92,.25);color:var(--gold);font-size:10px;letter-spacing:.16em;}
+.demo-label::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--gold);}
+.feature-card:focus-within,.feature-card:hover{border-color:rgba(232,201,135,.52);}
+
+@media(max-width:900px){.nav-links{gap:0;}.nav-concept{display:none;}.features-track{padding-left:22px;padding-right:22px;scroll-padding:22px;}.feature-card{width:82vw;min-width:82vw;}.feature-card .phone{width:156px;}.feature-controls{margin-top:20px;}}
+@media(max-width:720px){.hero-cta{margin-top:30px;}.features-pin{padding-bottom:76px;}.features-track{flex-direction:row;width:auto !important;gap:14px;}.feature-card{width:88vw !important;min-width:88vw;padding:30px 24px;}.feature-card .phone{width:150px;}.feature-points{grid-template-columns:1fr 1fr;}.section-note{padding:0 4px;}.news-item .n-title{white-space:normal;line-height:1.45;}.news-item .n-date{display:none;}#features .sec-title{font-size:29px;letter-spacing:.04em;white-space:nowrap;}}
+@media(max-width:420px){.feature-points{grid-template-columns:1fr;}}
+
+/* ============ 官网式交互层：固定品牌、章节锚点、英雄画册 ============ */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+button:focus-visible,a:focus-visible{outline:2px solid var(--gold-bright);outline-offset:4px;}
+header.nav{border-bottom-color:transparent;}
+header.nav .wrap{max-width:none;padding-left:38px;padding-right:38px;}
+header.nav.nav-solid{background:rgba(9,7,5,.82) !important;border-bottom-color:rgba(201,163,92,.16);backdrop-filter:blur(16px) saturate(120%) !important;}
+.brand.brand-lol{gap:0;min-width:152px;opacity:1;}
+.brand .brand-lol-logo{width:148px;height:auto;max-height:45px;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,.65));mix-blend-mode:normal;}
+.brand.brand-lol:hover{opacity:.82;}
+.section-rail{position:fixed;right:28px;top:50%;z-index:95;display:flex;flex-direction:column;align-items:flex-end;gap:11px;transform:translateY(-50%);}
+.section-rail a{display:flex;align-items:center;gap:10px;color:rgba(232,221,199,.42);font-size:10px;letter-spacing:.17em;transition:color .25s;}
+.section-rail a::after{content:'';width:5px;height:5px;border:1px solid rgba(201,163,92,.65);transform:rotate(45deg);transition:all .25s;}
+.section-rail a span{max-width:0;overflow:hidden;opacity:0;white-space:nowrap;transition:max-width .25s,opacity .2s;}
+.section-rail a:hover,.section-rail a.active{color:var(--gold-bright);}.section-rail a:hover span,.section-rail a.active span{max-width:64px;opacity:1;}
+.section-rail a.active::after{width:8px;height:8px;background:var(--gold);box-shadow:0 0 14px rgba(201,163,92,.8);}
+
+.champion-spotlight{position:relative;display:grid;grid-template-columns:minmax(0,1.34fr) minmax(330px,.66fr);min-height:466px;margin:0 auto 54px;border:1px solid rgba(201,163,92,.3);border-radius:5px;overflow:hidden;background:linear-gradient(140deg,#171109,#0d0a07 62%);box-shadow:0 26px 70px rgba(0,0,0,.32);}
+.spotlight-media{position:relative;overflow:hidden;min-height:100%;background:#111;}
+.spotlight-media::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(14,11,8,.02) 28%,rgba(14,11,8,.58) 100%),linear-gradient(0deg,rgba(14,11,8,.55),transparent 42%);pointer-events:none;}
+.spotlight-media::after{content:'';position:absolute;inset:14px;border:1px solid rgba(232,201,135,.17);z-index:2;pointer-events:none;}
+.spotlight-media img{width:100%;height:100%;min-height:466px;object-fit:cover;object-position:center;filter:saturate(.9) contrast(1.08) brightness(.9);transition:opacity .38s ease,transform 1.1s cubic-bezier(.2,.8,.2,1),filter .5s;}
+.champion-spotlight:hover .spotlight-media img{transform:scale(1.045);filter:saturate(1.02) contrast(1.1) brightness(.98);}
+.champion-spotlight.is-swapping .spotlight-media img{animation:spotlightSwap .52s ease both;}
+@keyframes spotlightSwap{0%{opacity:.22;transform:scale(1.07);filter:blur(2px) brightness(.68)}100%{opacity:1;transform:scale(1);filter:saturate(.9) contrast(1.08) brightness(.9)}}
+.spotlight-media .media-mark{position:absolute;left:34px;bottom:28px;z-index:3;display:flex;align-items:center;gap:10px;color:rgba(232,221,199,.7);font-size:10px;letter-spacing:.28em;}
+.spotlight-media .media-mark::before{content:'';width:30px;height:1px;background:var(--gold);}
+.spotlight-info{position:relative;display:flex;flex-direction:column;justify-content:center;padding:56px 50px;background:radial-gradient(circle at 100% 0,rgba(201,163,92,.12),transparent 40%),linear-gradient(155deg,rgba(26,20,12,.97),rgba(11,9,6,.98));}
+.spotlight-index{font-family:var(--serif);color:var(--gold);font-size:12px;letter-spacing:.32em;}
+.spotlight-role{margin-top:30px;color:var(--muted);font-size:11px;letter-spacing:.22em;text-transform:uppercase;}
+.spotlight-info h3{margin-top:10px;font-family:var(--serif);font-size:clamp(30px,3vw,44px);line-height:1.2;letter-spacing:.08em;}
+.spotlight-title-en{margin-top:10px;color:var(--gold-deep);font-size:12px;letter-spacing:.27em;text-transform:uppercase;}
+.spotlight-info p{margin-top:26px;color:var(--muted);font-size:14px;line-height:1.9;}
+.spotlight-divider{width:100%;height:1px;margin:28px 0 18px;background:linear-gradient(90deg,var(--gold-deep),transparent);}
+.spotlight-hint{display:flex;align-items:center;gap:10px;color:var(--paper);font-size:11px;letter-spacing:.17em;}.spotlight-hint svg{color:var(--gold);}
+.spotlight-tabs{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:52px;}
+.spotlight-tab{position:relative;aspect-ratio:1.48/1;overflow:hidden;border:1px solid rgba(201,163,92,.18);background:#15100a;text-align:left;isolation:isolate;transition:border-color .3s,transform .35s,box-shadow .35s;}
+.spotlight-tab img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:grayscale(.42) saturate(.55) brightness(.68);transition:filter .35s,transform .55s;z-index:-2;}
+.spotlight-tab::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(7,5,3,.9),rgba(7,5,3,.05) 80%);z-index:-1;}
+.spotlight-tab span{position:absolute;left:10px;bottom:8px;color:rgba(232,221,199,.75);font-family:var(--serif);font-size:12px;letter-spacing:.1em;transition:color .25s;}
+.spotlight-tab:hover{border-color:rgba(232,201,135,.65);transform:translateY(-4px) perspective(400px) rotateX(3deg);box-shadow:0 14px 24px rgba(0,0,0,.26);}.spotlight-tab:hover img{filter:grayscale(.08) saturate(.95) brightness(.92);transform:scale(1.08);}
+.spotlight-tab.active{border-color:var(--gold);box-shadow:inset 0 0 0 1px rgba(232,201,135,.22),0 0 20px rgba(201,163,92,.16);}.spotlight-tab.active img{filter:grayscale(0) saturate(1) brightness(.95);}.spotlight-tab.active span{color:var(--gold-bright);}
+.hero-archive-label{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:0 0 20px;padding-top:22px;border-top:1px solid rgba(201,163,92,.13);}.hero-archive-label h3{font-family:var(--serif);font-size:19px;letter-spacing:.12em;font-weight:600;}.hero-archive-label p{color:var(--muted);font-size:12px;letter-spacing:.12em;}
+.hero-grid{grid-template-columns:repeat(10,1fr);gap:8px;max-width:1120px;}
+.hero-cell{border-color:rgba(201,163,92,.13);border-radius:2px;}.hero-cell::before{content:'';position:absolute;inset:5px;z-index:2;border:1px solid transparent;transition:border-color .3s;pointer-events:none;}.hero-cell:hover::before{border-color:rgba(232,201,135,.45);}.hero-cell img{filter:saturate(.74) contrast(1.12) brightness(.93) url(#avatarSharpen);}.hero-cell:hover img{filter:saturate(1.06) contrast(1.08) brightness(1.03) url(#avatarSharpen);}
+
+@media(max-width:1120px){.champion-spotlight{grid-template-columns:1.18fr .82fr;}.spotlight-info{padding:42px 34px;}.hero-grid{grid-template-columns:repeat(8,1fr);}}
+@media(max-width:900px){.section-rail{display:none;}.champion-spotlight{grid-template-columns:1fr;}.spotlight-media{min-height:320px;}.spotlight-media img{min-height:320px;}.spotlight-info{padding:36px 30px;}.spotlight-tabs{grid-template-columns:repeat(4,1fr);}.hero-grid{grid-template-columns:repeat(6,1fr);}.brand.brand-lol{min-width:124px;}.brand .brand-lol-logo{width:120px;}}
+@media(max-width:720px){header.nav.nav-hidden{opacity:1;pointer-events:auto;}header.nav .wrap{padding-left:22px;padding-right:22px;}.champion-spotlight{margin-bottom:32px;}.spotlight-media,.spotlight-media img{min-height:260px;}.spotlight-info{padding:31px 25px;}.spotlight-role{margin-top:18px;}.spotlight-info p{margin-top:17px;}.spotlight-divider{margin:21px 0 15px;}.spotlight-tabs{grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:34px;}.spotlight-tab span{left:8px;bottom:6px;font-size:11px;}.hero-archive-label{align-items:flex-start;flex-direction:column;gap:4px;margin-top:6px;}.hero-grid{grid-template-columns:repeat(4,1fr);gap:8px;}.brand .brand-lol-logo{width:112px;max-height:36px;}.brand.brand-lol{min-width:116px;}}
+</style>
+<svg style="position:absolute;width:0;height:0;overflow:hidden;" aria-hidden="true">
+  <filter id="avatarSharpen"><feConvolveMatrix order="3" preserveAlpha="true"
+    kernelMatrix="0 -0.6 0 -0.6 3.4 -0.6 0 -0.6 0"/></filter>
+</svg>
+</head>
+<body>
+<div class="grain"></div>
+<nav class="section-rail" aria-label="章节导航">
+  <a class="active" href="#home"><span>首页</span></a>
+  <a href="#features"><span>功能</span></a>
+  <a href="#news"><span>资讯</span></a>
+  <a href="#esports"><span>赛事</span></a>
+  <a href="#heroes"><span>英雄</span></a>
+  <a href="#download"><span>下载</span></a>
+</nav>
+<!-- ============ 开场 ============ -->
+<div id="preloader">
+  <div class="seal" id="preSeal"><img src="assets/logo.png" alt="掌上英雄联盟标志"></div>
+  <div class="preloader-line" id="preLine">掌上英雄联盟</div>
+  <div class="preloader-sub" id="preSub">SUMMONER SERVICE CONCEPT</div>
+</div>
+
+<!-- ============ 顶部导航 ============ -->
+<header class="nav" id="nav">
+  <div class="wrap nav-inner">
+    <a class="brand brand-lol" href="#home" aria-label="英雄联盟首页">
+      <img class="brand-lol-logo" src="assets/lol-logo.png" alt="英雄联盟">
+      <span class="sr-only">英雄联盟</span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#home">首页<span class="en">Home</span></a></li>
+      <li><a href="#features">功能<span class="en">Features</span></a></li>
+      <li><a href="#news">资讯<span class="en">News</span></a></li>
+      <li><a href="#esports">赛事<span class="en">Esports</span></a></li>
+      <li><a href="#heroes">英雄<span class="en">Heroes</span></a></li>
+      <li><a href="#download">下载<span class="en">Download</span></a></li>
+    </ul>
+    <span class="nav-concept" aria-label="非官方概念演示">CONCEPT<br>SITE</span>
+    <a class="nav-download" href="#download">立即下载</a>
+    <button class="nav-toggle" id="navToggle" aria-label="展开菜单" aria-controls="navLinks" aria-expanded="false" onclick="toggleNavMenu()"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<!-- ============ Hero 首屏 ============ -->
+<section class="hero" id="home">
+  <div class="hero-bg">
+    <img src="assets/hero-bg.jpg" alt="英雄联盟国风英雄场景">
+  </div>
+  <div class="cloud-pattern"></div>
+  <div class="hero-vertical">懂联盟 · 更懂你的每一局</div>
+  <div class="wrap hero-inner">
+    <div class="hero-copy">
+      <span class="hero-kicker"><span class="concept-dot"></span>掌盟服务体验 · 非官方概念演示</span>
+      <h1 class="gold-text">掌上英雄联盟</h1>
+      <p class="hero-desc">围绕召唤师的战绩、版本、赛事、英雄与社区信息设计的掌上服务体验。功能与内容结构参照英雄联盟产品生态，演示数据不代表实时官方信息。</p>
+      <div class="hero-cta">
+        <a class="btn-primary" href="#download">前往下载入口</a>
+        <a class="btn-ghost" href="#features">查看功能</a>
+      </div>
+    </div>
+    <a class="hero-dl" href="#download">
+      <img src="assets/app-icon.png" alt="掌盟图标">
+      <span>
+        <span class="dl-name">掌上英雄联盟</span>
+        <span class="dl-sub" style="display:block;">扫码下载 App</span>
+      </span>
+      <span class="dl-btn">下载</span>
+    </a>
+  </div>
+  <div class="hero-scroll"><span>向下滚动</span><span class="line"></span></div>
+</section>
+
+<!-- ============ 功能画卷 ============ -->
+<section id="features">
+  <div class="cloud-pattern"></div>
+  <div class="wrap" style="padding-top:120px;">
+    <div class="sec-head reveal">
+      <span class="sec-kicker">CORE FEATURES</span>
+      <h2 class="sec-title gold-text">一个掌盟，装下整个峡谷</h2>
+      <div class="divider"></div>
+      <p class="sec-sub">横向展开功能画卷，看看掌盟如何陪你走过每一局</p>
+      <p class="section-note">以「查战绩、看版本、追赛事、学攻略、逛社区」为核心任务组织内容；卡片可横向拖动或使用左右按钮切换。</p>
+    </div>
+  </div>
+  <div class="features-pin" id="featuresPin">
+    <div class="features-track" id="featuresTrack">
+
+      <!-- 01 战绩查询 -->
+      <article class="feature-card">
+        <img class="fc-bg" src="assets/feat-bg.jpg" alt="英雄联盟原画">
+        <div class="fc-mask"></div>
+        <div class="phone">
+          <div class="phone-frame"><div class="phone-screen">
+            <img class="shot active" src="assets/shot1.jpg" alt="战绩查询个人主页">
+          </div></div>
+        </div>
+        <div>
+          <div class="feature-num">01 战绩查询</div>
+          <h3>战绩能力资产时刻<br>你的每一局都被铭记</h3>
+          <p>全新个人信息主页，随时了解自己或他人的战绩情况。动态、战绩、能力、资产、时刻五大档案自动整理，英雄时刻全局集锦一键回看，设置个性化头像与签名，做个真英雄。</p>
+          <ul class="feature-points">
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>个人战绩查询</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>英雄时刻集锦</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>能力分析报告</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>游戏资产展示</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>个性化主页</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>加好友与关注</li>
+          </ul>
+        </div>
+      </article>
+
+      <!-- 02 资讯电竞 -->
+      <article class="feature-card">
+        <img class="fc-bg" src="assets/feat-bg.jpg" alt="英雄联盟原画">
+        <div class="fc-mask"></div>
+        <div class="phone">
+          <div class="phone-frame"><div class="phone-screen">
+            <img class="shot active" src="assets/shot5.jpg" alt="资讯与赛事电竞">
+          </div></div>
+        </div>
+        <div>
+          <div class="feature-num">02 资讯电竞</div>
+          <h3>赛程一手抓<br>热梗不落空</h3>
+          <p>权威游戏资讯首发，版本动态、周免英雄第一时间掌握，资讯专区可按你的喜好自定义。赛事中心聚合赛程、积分榜、英雄 B/P、赛事回放、赛场数据与官方购票，赛事热议里和千万撸友一起聊。</p>
+          <ul class="feature-points">
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>官方资讯首发</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>赛程订阅提醒</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>积分榜与B/P</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>赛事高清回放</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>赛场数据</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>官方购票</li>
+          </ul>
+        </div>
+      </article>
+
+      <!-- 03 国服大数据 -->
+      <article class="feature-card">
+        <img class="fc-bg" src="assets/feat-bg.jpg" alt="英雄联盟原画">
+        <div class="fc-mask"></div>
+        <div class="phone">
+          <div class="phone-frame"><div class="phone-screen">
+            <img class="shot active" src="assets/shot4.jpg" alt="国服大数据攻略">
+          </div></div>
+        </div>
+        <div>
+          <div class="feature-num">03 国服大数据</div>
+          <h3>国服大数据<br>上分更容易</h3>
+          <p>汇聚国服真实对局数据，英雄胜率、登场率、禁用率按上单、打野、中单、下路、辅助分路一目了然。热门与国服数据双视角，版本攻略持续更新，全场最佳你说了算。</p>
+          <ul class="feature-points">
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>英雄胜率榜单</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>登场禁用数据</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>分路数据查询</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>版本攻略合集</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>国服真实样本</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>数据持续更新</li>
+          </ul>
+        </div>
+      </article>
+
+      <!-- 04 云顶阵容 -->
+      <article class="feature-card">
+        <img class="fc-bg" src="assets/feat-bg.jpg" alt="英雄联盟原画">
+        <div class="fc-mask"></div>
+        <div class="phone">
+          <div class="phone-frame"><div class="phone-screen">
+            <img class="shot active" src="assets/shot2.jpg" alt="云顶之弈阵容">
+          </div></div>
+        </div>
+        <div>
+          <div class="feature-num">04 云顶阵容</div>
+          <h3>阵容有数据<br>下棋有助力</h3>
+          <p>热门阵容与作者阵容随版本持续更新，羁绊组成、必备装备、变阵思路一图看懂。进入对战助手，精彩对局已经开始，也能助你快人一步。</p>
+          <ul class="feature-points">
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>热门阵容推荐</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>作者阵容上新</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>羁绊装备查询</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>对战助手</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>版本筛选</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>新手到进阶</li>
+          </ul>
+        </div>
+      </article>
+
+      <!-- 05 福利商城 -->
+      <article class="feature-card">
+        <img class="fc-bg" src="assets/feat-bg.jpg" alt="英雄联盟原画">
+        <div class="fc-mask"></div>
+        <div class="phone">
+          <div class="phone-frame"><div class="phone-screen">
+            <img class="shot active" src="assets/shot3.jpg" alt="福利商城">
+          </div></div>
+        </div>
+        <div>
+          <div class="feature-num">05 福利商城</div>
+          <h3>整活套路多<br>周周领福利</h3>
+          <p>每日特权任务轻松完成，礼包、小小英雄、竞技场与周边新品抢先拥有。萌币积分兑换好礼，赛季主题礼包限时上架，周周都有新惊喜。</p>
+          <ul class="feature-points">
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>每日特权任务</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>礼包限时领取</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>小小英雄图鉴</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>竞技场新品</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>周边商城</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>萌币兑换</li>
+          </ul>
+        </div>
+      </article>
+
+    </div>
+    <div class="feature-controls" aria-label="功能画卷控制">
+      <button type="button" id="featurePrev" aria-label="查看上一项功能">←</button>
+      <span id="featureIndicator" aria-live="polite">01 / 05</span>
+      <button type="button" id="featureNext" aria-label="查看下一项功能">→</button>
+    </div>
+    <div class="features-progress"><span id="featuresProgress"></span></div>
+    <div class="features-hint">SCROLL · 画卷展开</div>
+  </div>
+</section>
+
+<!-- ============ 资讯中心 ============ -->
+<section class="news-section" id="news">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-kicker">NEWS CENTER</span>
+      <h2 class="sec-title gold-text">峡谷资讯，一手掌握</h2>
+      <div class="divider"></div>
+      <p class="sec-sub">版本动态、赛事快讯、活动公告，按用户意图快速聚合</p>
+      <p class="section-note">本区为信息架构演示，内容与日期均为样例。实时资讯请以英雄联盟与掌上英雄联盟的官方渠道为准。</p>
+    </div>
+    <div class="news-layout reveal">
+      <div class="news-main">
+        <div class="news-tabs" id="newsTabs">
+          <button class="active" data-tab="hot">热门</button>
+          <button data-tab="notice">公告</button>
+          <button data-tab="match">赛事</button>
+          <button data-tab="event">活动</button>
+        </div>
+        <div class="news-list" id="newsList"></div>
+      </div>
+      <div class="news-feature" role="button" tabindex="0" data-toast="演示专题：赛事内容聚合入口">
+        <img src="assets/splash/Kaisa.jpg" alt="赛事专题视觉示例">
+        <div class="nf-overlay">
+          <span class="nf-tag">DEMO</span>
+          <h4>赛事专题聚合</h4>
+          <p>赛程、积分、直播与回放的统一入口 · 演示内容</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 全功能矩阵 ===== -->
+<section class="more-features" id="more">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-kicker">ALL IN ONE</span>
+      <h2 class="sec-title gold-text">八大能力，一个 App 全装下</h2>
+      <div class="divider"></div>
+      <p class="sec-sub">从查战绩到看比赛，从上分攻略到社区互动，掌上英雄联盟就是你的随身峡谷</p>
+    </div>
+    <div class="mf-grid reveal">
+      <div class="mf-item" onclick="showToast('英雄资料库：全英雄技能皮肤随时查')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l2.4 5.4L20 8.3l-4 3.9.9 5.5L12 15l-4.9 2.7.9-5.5-4-3.9 5.6-.9z"/></svg>
+        <h4>英雄资料库</h4>
+        <p>全英雄技能、皮肤、定位、出装随时查，新手老手都能快速上手</p>
+      </div>
+      <div class="mf-item" onclick="showToast('皮肤资产：已拥有皮肤一键盘点')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 7H4a1 1 0 00-1 1v9a1 1 0 001 1h16a1 1 0 001-1V8a1 1 0 00-1-1z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+        <h4>我的皮肤资产</h4>
+        <p>已拥有皮肤一键盘点，稀有度、价值一目了然，收藏控必备</p>
+      </div>
+      <div class="mf-item" onclick="showToast('好友社交：开黑邀请实时同步')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        <h4>好友社交动态</h4>
+        <p>好友战绩、在线状态、开黑邀请实时同步，再也不错过五黑车</p>
+      </div>
+      <div class="mf-item" onclick="showToast('攻略中心：大神出装符文推荐')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+        <h4>上分攻略中心</h4>
+        <p>大神攻略、出装推荐、符文搭配、对线技巧，助你轻松上分</p>
+      </div>
+      <div class="mf-item" onclick="showToast('版本速递：改动第一时间推送')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        <h4>版本更新速递</h4>
+        <p>版本改动、英雄调整、装备更新第一时间推送，永远快人一步</p>
+      </div>
+      <div class="mf-item" onclick="showToast('社区广场：FANART话题讨论')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        <h4>撸友社区广场</h4>
+        <p>FANART、话题讨论、兴趣圈互动，找到志同道合的召唤师</p>
+      </div>
+      <div class="mf-item" onclick="showToast('赛事回放：LPL总决赛随时看')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+        <h4>赛事回放中心</h4>
+        <p>LPL、全球总决赛、MSI 精彩回放随时看，热梗名场面不错过</p>
+      </div>
+      <div class="mf-item" onclick="showToast('一键下载：四款游戏快速安装')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <h4>游戏一键下载</h4>
+        <p>LOL 端游、手游、云顶之弈、金铲铲之战，四款游戏快速下载</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 赛事专区 ============ -->
+<section class="esports-section" id="esports">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-kicker">ESPORTS CENTER</span>
+      <h2 class="sec-title gold-text">赛事直播，随时在线</h2>
+      <div class="divider"></div>
+      <p class="sec-sub">赛程提醒、直播入口、积分与赛后回放，按一次观赛旅程组织</p>
+      <p class="section-note">以下战队、赛程及榜单仅用于交互演示，不代表真实比赛状态或官方赛程。</p>
+    </div>
+
+    <div class="live-banner reveal" role="button" tabindex="0" data-toast="演示入口：赛事直播间">
+      <div class="live-left">
+        <div class="live-badge"><span class="dot"></span><span>LIVE</span></div>
+        <div class="live-match">赛事中心 · 聚合演示
+          <small>直播提醒、对阵信息、回放入口的一体化观赛体验</small>
+        </div>
+      </div>
+      <div class="live-go">进入直播</div>
+    </div>
+
+    <div class="match-grid reveal">
+      <div class="match-panel">
+        <div class="panel-head"><h4>近期赛程</h4><span>DEMO SCHEDULE</span></div>
+        <div class="match-row" onclick="showToast('预约：T1 vs JDG')">
+          <div class="team"><span class="team-logo" style="background:linear-gradient(135deg,#8b1a1a,#c43c3c);color:#fff;">T1</span>T1</div>
+          <div class="match-mid"><span class="vs">VS</span><span class="mtime">09/26 19:00</span></div>
+          <div class="team r"><span class="team-logo" style="background:linear-gradient(135deg,#5a1a1a,#8b2b2b);color:#d8b770;">JDG</span>JDG</div>
+        </div>
+        <div class="match-row" onclick="showToast('预约：TES vs LNG')">
+          <div class="team"><span class="team-logo" style="background:linear-gradient(135deg,#8b1a1a,#c43c3c);color:#fff;">TES</span>TES</div>
+          <div class="match-mid"><span class="vs">VS</span><span class="mtime">09/27 18:00</span></div>
+          <div class="team r"><span class="team-logo" style="background:linear-gradient(135deg,#1a2b5a,#3b4a8b);color:#a8c4e8;">LNG</span>LNG</div>
+        </div>
+        <div class="match-row" onclick="showToast('预约：BLG vs DK')">
+          <div class="team"><span class="team-logo" style="background:linear-gradient(135deg,#1a3a6b,#2b5aa0);color:#fff;">BLG</span>BLG</div>
+          <div class="match-mid"><span class="vs">VS</span><span class="mtime">09/28 19:00</span></div>
+          <div class="team r"><span class="team-logo" style="background:linear-gradient(135deg,#2b2b4a,#5a5a8b);color:#d8d8f0;">DK</span>DK</div>
+        </div>
+        <div class="match-row" onclick="showToast('预约：GEN vs HLE')">
+          <div class="team"><span class="team-logo" style="background:linear-gradient(135deg,#8b6b1a,#c4a43c);color:#1a1308;">GEN</span>GEN</div>
+          <div class="match-mid"><span class="vs">VS</span><span class="mtime">09/29 18:00</span></div>
+          <div class="team r"><span class="team-logo" style="background:linear-gradient(135deg,#6b3b1a,#a86b3c);color:#f0d8b8;">HLE</span>HLE</div>
+        </div>
+      </div>
+
+      <div class="stand-panel">
+        <div class="panel-head"><h4>观赛数据</h4><span>DEMO STANDINGS</span></div>
+        <div class="stand-row head"><span class="stand-rank">#</span><span class="stand-name">战队</span><span class="stand-w">胜</span><span class="stand-l">负</span></div>
+        <div class="stand-row"><span class="stand-rank">1</span><span class="stand-name"><span class="mini-logo" style="background:linear-gradient(135deg,#1a3a6b,#2b5aa0);color:#fff;">BLG</span>BLG</span><span class="stand-w">15</span><span class="stand-l">2</span></div>
+        <div class="stand-row"><span class="stand-rank">2</span><span class="stand-name"><span class="mini-logo" style="background:linear-gradient(135deg,#8b1a1a,#c43c3c);color:#fff;">TES</span>TES</span><span class="stand-w">14</span><span class="stand-l">3</span></div>
+        <div class="stand-row"><span class="stand-rank">3</span><span class="stand-name"><span class="mini-logo" style="background:linear-gradient(135deg,#5a1a1a,#8b2b2b);color:#d8b770;">JDG</span>JDG</span><span class="stand-w">13</span><span class="stand-l">4</span></div>
+        <div class="stand-row"><span class="stand-rank">4</span><span class="stand-name"><span class="mini-logo" style="background:linear-gradient(135deg,#1a2b5a,#3b4a8b);color:#a8c4e8;">LNG</span>LNG</span><span class="stand-w">12</span><span class="stand-l">5</span></div>
+        <div class="stand-row"><span class="stand-rank">5</span><span class="stand-name"><span class="mini-logo" style="background:linear-gradient(135deg,#3a3a3a,#6b6b6b);color:#e8a43c;">WBG</span>WBG</span><span class="stand-w">11</span><span class="stand-l">6</span></div>
+        <div class="stand-row"><span class="stand-rank">6</span><span class="stand-name"><span class="mini-logo" style="background:linear-gradient(135deg,#1a1a2b,#3b3b5a);color:#d4605a;">EDG</span>EDG</span><span class="stand-w">10</span><span class="stand-l">7</span></div>
+        <div class="stand-row"><span class="stand-rank">7</span><span class="stand-name"><span class="mini-logo" style="background:linear-gradient(135deg,#6b1a3b,#a83c5a);color:#f0b8c8;">RNG</span>RNG</span><span class="stand-w">9</span><span class="stand-l">8</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 英雄资料库 ============ -->
+<section id="heroes" style="padding:120px 0;">
+  <div class="cloud-pattern"></div>
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-kicker">CHAMPION ARCHIVE</span>
+      <h2 class="sec-title gold-text">全英雄资料，一手掌握</h2>
+      <div class="divider"></div>
+      <p class="sec-sub">从精美原画到完整资料库，英雄定位、技能与皮肤资产随时查询</p>
+    </div>
+    <div class="champion-spotlight reveal" id="championSpotlight" aria-live="polite">
+      <div class="spotlight-media">
+        <img id="spotlightImage" src="assets/splash/Ahri.jpg" alt="九尾妖狐 阿狸原画">
+        <span class="media-mark">CHAMPION SPOTLIGHT</span>
+      </div>
+      <div class="spotlight-info">
+        <span class="spotlight-index" id="spotlightIndex">01 / 07</span>
+        <span class="spotlight-role" id="spotlightRole">MAGE · ASSASSIN</span>
+        <h3 class="gold-text" id="spotlightName">九尾妖狐 · 阿狸</h3>
+        <span class="spotlight-title-en" id="spotlightEnglish">AHRI · THE NINE-TAILED FOX</span>
+        <p id="spotlightDesc">灵动的魅惑与爆发收割，让她始终拥有改变团战走向的能力。</p>
+        <div class="spotlight-divider"></div>
+        <span class="spotlight-hint"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg>选择下方英雄，浏览高精原画</span>
+      </div>
+    </div>
+    <div class="spotlight-tabs reveal" id="spotlightTabs" role="tablist" aria-label="精选英雄">
+      <button class="spotlight-tab active" type="button" role="tab" aria-selected="true" data-image="assets/splash/Ahri.jpg" data-name="九尾妖狐 · 阿狸" data-en="AHRI · THE NINE-TAILED FOX" data-role="MAGE · ASSASSIN" data-desc="灵动的魅惑与爆发收割，让她始终拥有改变团战走向的能力。"><img src="assets/splash/Ahri.jpg" alt=""><span>阿狸</span></button>
+      <button class="spotlight-tab" type="button" role="tab" aria-selected="false" data-image="assets/splash/Garen.jpg" data-name="德玛西亚之力 · 盖伦" data-en="GAREN · THE MIGHT OF DEMACIA" data-role="FIGHTER · TANK" data-desc="以不屈的意志守住阵线，在最需要他的时刻率先冲入战场。"><img src="assets/splash/Garen.jpg" alt=""><span>盖伦</span></button>
+      <button class="spotlight-tab" type="button" role="tab" aria-selected="false" data-image="assets/splash/Caitlyn.jpg" data-name="皮城女警 · 凯特琳" data-en="CAITLYN · THE SHERIFF OF PILTOVER" data-role="MARKSMAN" data-desc="精准的陷阱与超远射程，让每一次追击都拥有清晰的节奏。"><img src="assets/splash/Caitlyn.jpg" alt=""><span>凯特琳</span></button>
+      <button class="spotlight-tab" type="button" role="tab" aria-selected="false" data-image="assets/splash/Irelia.jpg" data-name="刀锋舞者 · 艾瑞莉娅" data-en="IRELIA · THE BLADE DANCER" data-role="FIGHTER · ASSASSIN" data-desc="刀锋随心而动，在秩序与破局之间完成一段轻盈又凌厉的舞步。"><img src="assets/splash/Irelia.jpg" alt=""><span>艾瑞莉娅</span></button>
+      <button class="spotlight-tab" type="button" role="tab" aria-selected="false" data-image="assets/splash/Jinx.jpg" data-name="暴走萝莉 · 金克丝" data-en="JINX · THE LOOSE CANNON" data-role="MARKSMAN" data-desc="失控的火力和充满个性的节拍，让战场在她的笑声中彻底沸腾。"><img src="assets/splash/Jinx.jpg" alt=""><span>金克丝</span></button>
+      <button class="spotlight-tab" type="button" role="tab" aria-selected="false" data-image="assets/splash/Kaisa.jpg" data-name="虚空之女 · 卡莎" data-en="KAI'SA · DAUGHTER OF THE VOID" data-role="MARKSMAN" data-desc="在虚空边缘磨炼出的敏锐直觉，让她能于险境中找准最好的切入时机。"><img src="assets/splash/Kaisa.jpg" alt=""><span>卡莎</span></button>
+      <button class="spotlight-tab" type="button" role="tab" aria-selected="false" data-image="assets/splash/Lux.jpg" data-name="光辉女郎 · 拉克丝" data-en="LUX · THE LADY OF LUMINOSITY" data-role="MAGE · SUPPORT" data-desc="光芒划开阴影，既能守护队友，也能为战局落下决定性的一击。"><img src="assets/splash/Lux.jpg" alt=""><span>拉克丝</span></button>
+    </div>
+    <div class="hero-archive-label reveal">
+      <h3>英雄资料库</h3>
+      <p>CHAMPION ARCHIVE · 按定位快速检索</p>
+    </div>
+    <div class="hero-filter reveal" id="heroFilter">
+      <button class="active" data-role="all" aria-pressed="true">所有英雄</button>
+      <button data-role="fighter" aria-pressed="false">战士</button>
+      <button data-role="mage" aria-pressed="false">法师</button>
+      <button data-role="assassin" aria-pressed="false">刺客</button>
+      <button data-role="tank" aria-pressed="false">坦克</button>
+      <button data-role="marksman" aria-pressed="false">射手</button>
+      <button data-role="support" aria-pressed="false">辅助</button>
+    </div>
+    <div class="hero-grid reveal" id="heroGrid">
+      <div class="hero-cell" data-roles="fighter assassin" onclick="showToast('盲僧 · 战士/刺客')"><img src="assets/avatars/LeeSin.png" alt="盲僧"><span class="hname">盲僧</span></div>
+      <div class="hero-cell" data-roles="fighter assassin" onclick="showToast('疾风剑豪 · 战士/刺客')"><img src="assets/avatars/Yasuo.png" alt="疾风剑豪"><span class="hname">亚索</span></div>
+      <div class="hero-cell" data-roles="fighter assassin" onclick="showToast('放逐之刃 · 战士/刺客')"><img src="assets/avatars/Riven.png" alt="放逐之刃"><span class="hname">锐雯</span></div>
+      <div class="hero-cell" data-roles="fighter tank" onclick="showToast('德邦总管 · 战士/坦克')"><img src="assets/avatars/XinZhao.png" alt="德邦总管"><span class="hname">赵信</span></div>
+      <div class="hero-cell" data-roles="fighter" onclick="showToast('武器大师 · 战士')"><img src="assets/avatars/Jax.png" alt="武器大师"><span class="hname">贾克斯</span></div>
+      <div class="hero-cell" data-roles="fighter tank" onclick="showToast('诺克萨斯之手 · 战士/坦克')"><img src="assets/avatars/Darius.png" alt="诺克萨斯之手"><span class="hname">德莱厄斯</span></div>
+      <div class="hero-cell" data-roles="fighter assassin" onclick="showToast('无双剑姬 · 战士/刺客')"><img src="assets/avatars/Fiora.png" alt="无双剑姬"><span class="hname">菲奥娜</span></div>
+      <div class="hero-cell" data-roles="fighter tank" onclick="showToast('德玛西亚之力 · 战士/坦克')"><img src="assets/avatars/Garen.png" alt="德玛西亚之力"><span class="hname">盖伦</span></div>
+      <div class="hero-cell" data-roles="mage assassin" onclick="showToast('九尾妖狐 · 法师/刺客')"><img src="assets/avatars/Ahri.png" alt="九尾妖狐"><span class="hname">阿狸</span></div>
+      <div class="hero-cell" data-roles="mage support" onclick="showToast('光辉女郎 · 法师/辅助')"><img src="assets/avatars/Lux.png" alt="光辉女郎"><span class="hname">拉克丝</span></div>
+      <div class="hero-cell" data-roles="mage support" onclick="showToast('黑暗之女 · 法师/辅助')"><img src="assets/avatars/Annie.png" alt="黑暗之女"><span class="hname">安妮</span></div>
+      <div class="hero-cell" data-roles="mage" onclick="showToast('邪恶小法师 · 法师')"><img src="assets/avatars/Veigar.png" alt="邪恶小法师"><span class="hname">维迦</span></div>
+      <div class="hero-cell" data-roles="mage support" onclick="showToast('发条魔灵 · 法师/辅助')"><img src="assets/avatars/Orianna.png" alt="发条魔灵"><span class="hname">奥莉安娜</span></div>
+      <div class="hero-cell" data-roles="mage" onclick="showToast('暗黑元首 · 法师')"><img src="assets/avatars/Syndra.png" alt="暗黑元首"><span class="hname">辛德拉</span></div>
+      <div class="hero-cell" data-roles="assassin mage" onclick="showToast('不祥之刃 · 刺客/法师')"><img src="assets/avatars/Katarina.png" alt="不祥之刃"><span class="hname">卡特琳娜</span></div>
+      <div class="hero-cell" data-roles="assassin" onclick="showToast('离群之刺 · 刺客')"><img src="assets/avatars/Akali.png" alt="离群之刺"><span class="hname">阿卡丽</span></div>
+      <div class="hero-cell" data-roles="assassin" onclick="showToast('影流之主 · 刺客')"><img src="assets/avatars/Zed.png" alt="影流之主"><span class="hname">劫</span></div>
+      <div class="hero-cell" data-roles="assassin" onclick="showToast('刀锋之影 · 刺客')"><img src="assets/avatars/Talon.png" alt="刀锋之影"><span class="hname">泰隆</span></div>
+      <div class="hero-cell" data-roles="assassin fighter" onclick="showToast('潮汐海灵 · 刺客/战士')"><img src="assets/avatars/Fizz.png" alt="潮汐海灵"><span class="hname">菲兹</span></div>
+      <div class="hero-cell" data-roles="assassin mage" onclick="showToast('时间刺客 · 刺客/法师')"><img src="assets/avatars/Ekko.png" alt="时间刺客"><span class="hname">艾克</span></div>
+      <div class="hero-cell" data-roles="marksman mage" onclick="showToast('虚空之女 · 射手/法师')"><img src="assets/avatars/Kaisa.png" alt="虚空之女"><span class="hname">卡莎</span></div>
+      <div class="hero-cell" data-roles="tank mage" onclick="showToast('熔岩巨兽 · 坦克/法师')"><img src="assets/avatars/Malphite.png" alt="熔岩巨兽"><span class="hname">墨菲特</span></div>
+      <div class="hero-cell" data-roles="tank support" onclick="showToast('殇之木乃伊 · 坦克/辅助')"><img src="assets/avatars/Amumu.png" alt="殇之木乃伊"><span class="hname">阿木木</span></div>
+      <div class="hero-cell" data-roles="tank support" onclick="showToast('牛头酋长 · 坦克/辅助')"><img src="assets/avatars/Alistar.png" alt="牛头酋长"><span class="hname">阿利斯塔</span></div>
+      <div class="hero-cell" data-roles="tank support" onclick="showToast('弗雷尔卓德之心 · 坦克/辅助')"><img src="assets/avatars/Braum.png" alt="弗雷尔卓德之心"><span class="hname">布隆</span></div>
+      <div class="hero-cell" data-roles="tank support" onclick="showToast('曙光女神 · 坦克/辅助')"><img src="assets/avatars/Leona.png" alt="曙光女神"><span class="hname">蕾欧娜</span></div>
+      <div class="hero-cell" data-roles="tank fighter support" onclick="showToast('蒸汽机器人 · 坦克/战士/辅助')"><img src="assets/avatars/Blitzcrank.png" alt="蒸汽机器人"><span class="hname">布里茨</span></div>
+      <div class="hero-cell" data-roles="marksman" onclick="showToast('暴走萝莉 · 射手')"><img src="assets/avatars/Jinx.png" alt="暴走萝莉"><span class="hname">金克丝</span></div>
+      <div class="hero-cell" data-roles="marksman support" onclick="showToast('寒冰射手 · 射手/辅助')"><img src="assets/avatars/Ashe.png" alt="寒冰射手"><span class="hname">艾希</span></div>
+      <div class="hero-cell" data-roles="marksman" onclick="showToast('皮城女警 · 射手')"><img src="assets/avatars/Caitlyn.png" alt="皮城女警"><span class="hname">凯特琳</span></div>
+      <div class="hero-cell" data-roles="marksman mage" onclick="showToast('探险家 · 射手/法师')"><img src="assets/avatars/Ezreal.png" alt="探险家"><span class="hname">伊泽瑞尔</span></div>
+      <div class="hero-cell" data-roles="marksman mage" onclick="showToast('惩戒之箭 · 射手/法师')"><img src="assets/avatars/Varus.png" alt="惩戒之箭"><span class="hname">韦鲁斯</span></div>
+      <div class="hero-cell" data-roles="marksman" onclick="showToast('逆羽 · 射手')"><img src="assets/avatars/Xayah.png" alt="逆羽"><span class="hname">霞</span></div>
+      <div class="hero-cell" data-roles="support tank" onclick="showToast('魂锁典狱长 · 辅助/坦克')"><img src="assets/avatars/Thresh.png" alt="魂锁典狱长"><span class="hname">锤石</span></div>
+      <div class="hero-cell" data-roles="support mage" onclick="showToast('仙灵女巫 · 辅助/法师')"><img src="assets/avatars/Lulu.png" alt="仙灵女巫"><span class="hname">璐璐</span></div>
+      <div class="hero-cell" data-roles="support mage" onclick="showToast('风暴之怒 · 辅助/法师')"><img src="assets/avatars/Janna.png" alt="风暴之怒"><span class="hname">迦娜</span></div>
+      <div class="hero-cell" data-roles="support mage" onclick="showToast('众星之子 · 辅助/法师')"><img src="assets/avatars/Soraka.png" alt="众星之子"><span class="hname">索拉卡</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 下载区 ============ -->
+<section id="download">
+  <div class="wrap">
+    <div class="download-box reveal">
+      <img class="dl-bg" src="assets/dl-bg-new.jpg" alt="英雄联盟原画">
+      <div class="cloud-pattern"></div>
+      <div class="dl-left">
+        <h2 class="gold-text">现在，把峡谷装进口袋</h2>
+        <p>扫描二维码或选择应用渠道，免费下载掌上英雄联盟，开启你的专属助手。</p>
+        <div class="dl-meta">
+          开发者：<b>深圳市腾讯计算机系统有限公司</b><br>
+          官方认证：<b>英雄联盟官方 App</b><br>
+          支持平台：<b>iOS / Android</b>
+        </div>
+      </div>
+      <div class="dl-qr">
+        <div class="qr-frame"><img src="assets/qrcode.jpg" alt="掌盟下载二维码"></div>
+        <p>扫码下载</p>
+      </div>
+      <div class="dl-right">
+        <a class="dl-store" href="https://mlol.qt.qq.com/zmguide/index.html" target="_blank" rel="noopener">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 1.6c.1 1-.3 2-1 2.8-.7.8-1.8 1.4-2.8 1.3-.1-1 .4-2 1-2.7.7-.8 1.9-1.3 2.8-1.4zM20 17.4c-.5 1.2-.8 1.7-1.5 2.7-1 1.4-2.4 3.1-4.1 3.1-1.5 0-1.9-1-3.9-1-2 0-2.5 1-3.9 1-1.7 0-3-1.6-4-3-2-2.7-3.5-7.7-1.5-11 1.4-2.3 3.6-3.7 5.8-3.7 2.2 0 3.5 1.2 5.3 1.2 1.7 0 2.8-1.2 5.3-1.2 1.9 0 3.9 1 5.3 2.8-4.7 2.6-3.9 9.2-4.3 9.1z"/></svg>
+          <span><span class="s1">Download on the</span><span class="s2">App Store</span></span>
+        </a>
+        <a class="dl-store" href="https://mlol.qt.qq.com/zmguide/index.html" target="_blank" rel="noopener">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M3.6 2.3c-.3.3-.5.8-.5 1.4v16.6c0 .6.2 1.1.5 1.4l.1.1L13 12.2v-.2L3.7 2.2l-.1.1zM17 16.2l-2.8-2.8 2.8-2.8 3.7 2.1c1 .6 1 1.6 0 2.2L17 16.2zm-3.4-3.4L4.4 22.2c.3.4 1 .4 1.7.1l10.9-6.2-3.4-3.3zM6.1 1.7c-.7-.4-1.4-.3-1.7.1l9.2 9.4 3.4-3.4L6.1 1.7z"/></svg>
+          <span><span class="s1">Android 应用下载</span><span class="s2">应用宝 / 官网</span></span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Footer ============ -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="#home">
+          <img class="brand-logo" src="assets/logo.png" alt="掌上英雄联盟标志">
+          <span class="brand-name">掌上英雄联盟</span>
+        </a>
+        <p>以召唤师的战绩、资讯、赛事、数据、阵容与福利旅程为蓝本的非官方产品设计演示。</p>
+        <div style="margin-top:22px;display:flex;align-items:center;gap:12px;">
+          <img src="assets/lol-logo.png" alt="英雄联盟官方" style="height:36px;width:auto;">
+          <span style="font-size:12px;color:var(--muted);letter-spacing:.15em;">非官方设计演示 · 仅作作品展示</span>
+        </div>
+      </div>
+      <div class="foot-col">
+        <h4>官方渠道</h4>
+        <a href="https://lol.qq.com/main.shtml" target="_blank" rel="noopener">英雄联盟官网</a>
+        <a href="https://mlol.qt.qq.com/zmguide/index.html" target="_blank" rel="noopener">掌盟下载页</a>
+        <a href="https://lol.qq.com/act/a20180904community/page1.html" target="_blank" rel="noopener">英雄联盟官方社区</a>
+        <a href="https://lol.qq.com/" target="_blank" rel="noopener">LOL 宇宙</a>
+      </div>
+      <div class="foot-col">
+        <h4>游戏中心</h4>
+        <a href="https://lol.qq.com/main.shtml" target="_blank" rel="noopener">攻略中心</a>
+        <a href="https://lol.qq.com/main.shtml" target="_blank" rel="noopener">赛事中心</a>
+        <a href="https://lol.qq.com/main.shtml" target="_blank" rel="noopener">云顶之弈</a>
+        <a href="https://lol.qq.com/main.shtml" target="_blank" rel="noopener">FANART 创作馆</a>
+      </div>
+    </div>
+    <div class="health">抵制不良游戏　拒绝盗版游戏　注意自我保护　谨防受骗上当<br>适度游戏益脑　沉迷游戏伤身　合理安排时间　享受健康生活</div>
+    <div class="copyright">
+      © Riot Games, Inc. 及 深圳市腾讯计算机系统有限公司 保留所有权利。英雄联盟、掌上英雄联盟及相关标识为权利方所有。<br>
+      <span class="disclaim">本页面为网页设计练习作品，非官方页面，不提供真实下载与数据服务；请通过官方渠道获取 App。</span>
+    </div>
+  </div>
+</footer>
+
+<div id="toast" role="status"></div>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script>
+(function(){
+  'use strict';
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var preloader = document.getElementById('preloader');
+
+  /* ---------- Toast ---------- */
+  var toastEl = document.getElementById('toast');
+  var toastTimer = null;
+  var NEWS_DATA = {
+  hot: [
+    {tag:'hot', title:'信息流设计：将版本、赛事与社区焦点集中呈现', date:'示例'},
+    {tag:'hot', title:'战绩页设计：让关键对局、常用英雄和能力趋势一眼可见', date:'示例'},
+    {tag:'event', title:'活动聚合：签到、任务与福利入口遵循同一行动路径', date:'示例'},
+    {tag:'notice', title:'内容提示：所有动态信息均应链接至可验证的官方来源', date:'示例'},
+    {tag:'match', title:'赛事体验：从赛程预约到赛后回看保持连续上下文', date:'示例'}
+  ],
+  notice: [
+    {tag:'notice', title:'产品原则：重大版本与服务公告应有置顶、时间和来源标识', date:'示例'},
+    {tag:'notice', title:'安全设计：账号与授权类操作应回流到官方安全页面', date:'示例'},
+    {tag:'notice', title:'可访问性：动态内容需要键盘可达，并尊重减少动态效果偏好', date:'示例'},
+    {tag:'notice', title:'内容机制：以官方页为唯一真源，展示页避免复制实时数据', date:'示例'},
+    {tag:'notice', title:'社区治理：用户讨论入口应标注规则、举报与风险提示', date:'示例'}
+  ],
+  match: [
+    {tag:'match', title:'赛程提醒：关注战队后，开赛前按时区推送提醒', date:'示例'},
+    {tag:'match', title:'观赛路径：对阵、直播、数据、回放在同一赛事专题内衔接', date:'示例'},
+    {tag:'match', title:'赛后内容：关键回合、英雄选择与数据复盘支持快速浏览', date:'示例'},
+    {tag:'match', title:'预约状态：用清晰的已预约反馈代替无结果的点击', date:'示例'},
+    {tag:'match', title:'赛事数据：需注明数据口径、更新时间与授权来源', date:'示例'}
+  ],
+  event: [
+    {tag:'event', title:'任务中心：把「领取条件、进度、奖励」放在单一可读卡片中', date:'示例'},
+    {tag:'event', title:'权益提醒：限时内容需明确结束时间与适用范围', date:'示例'},
+    {tag:'event', title:'福利入口：避免将下载、登录、领取混为同一行动按钮', date:'示例'},
+    {tag:'event', title:'创作社区：为同人内容提供标签、原作者署名及举报通路', date:'示例'},
+    {tag:'event', title:'活动详情：对外跳转前提示官方页面与账号登录要求', date:'示例'}
+  ]
+};
+function renderNews(tab){
+  var list = document.getElementById('newsList');
+  var items = NEWS_DATA[tab] || [];
+  list.innerHTML = items.map(function(n){
+    return '<div class="news-item" onclick="showToast(\'查看：'+n.title.replace(/'/g,'')+'\')">' +
+      '<span class="n-tag '+n.tag+'">'+(n.tag==='hot'?'热门':n.tag==='notice'?'公告':n.tag==='match'?'赛事':'活动')+'</span>' +
+      '<span class="n-title">'+n.title+'</span>' +
+      '<span class="n-date">'+n.date+'</span></div>';
+  }).join('');
+}
+renderNews('hot');
+document.getElementById('newsTabs').addEventListener('click', function(e){
+  if(e.target.tagName === 'BUTTON'){
+    var btns = this.querySelectorAll('button');
+    for(var i=0;i<btns.length;i++) btns[i].classList.remove('active');
+    e.target.classList.add('active');
+    renderNews(e.target.getAttribute('data-tab'));
+  }
+});
+
+function showToast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    if (toastTimer){ clearTimeout(toastTimer); }
+    toastTimer = setTimeout(function(){ toastEl.classList.remove('show'); }, 2400);
+  }
+  window.showToast = showToast;
+
+  /* ---------- 导航 ---------- */
+  var nav = document.getElementById('nav');
+  var navToggle = document.getElementById('navToggle');
+  var navLinks = document.getElementById('navLinks');
+  var lastNavY = 0;
+  window.addEventListener('scroll', function(){
+    var y = window.scrollY;
+    nav.classList.toggle('nav-solid', y > 24);
+    if(y > 260 && y > lastNavY + 6){ nav.classList.add('nav-hidden'); }
+    else if(y < lastNavY - 6 || y < 90){ nav.classList.remove('nav-hidden'); }
+    lastNavY = y;
+  }, {passive:true});
+  function toggleNavMenu(){
+    var isOpen = !navLinks.classList.contains('open');
+    navToggle.classList.toggle('open', isOpen);
+    navLinks.classList.toggle('open', isOpen);
+    navToggle.setAttribute('aria-expanded', String(isOpen));
+    navToggle.setAttribute('aria-label', isOpen ? '收起菜单' : '展开菜单');
+  }
+  window.toggleNavMenu = toggleNavMenu;
+  navLinks.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){
+      navToggle.classList.remove('open');
+      navLinks.classList.remove('open');
+      navToggle.setAttribute('aria-expanded', 'false');
+      navToggle.setAttribute('aria-label', '展开菜单');
+    });
+  });
+
+  /* ---------- 官网式章节定位 ---------- */
+  var sectionNames = ['home', 'features', 'news', 'esports', 'heroes', 'download'];
+  var sectionLinks = document.querySelectorAll('#navLinks a, .section-rail a');
+  function setActiveSection(id){
+    sectionLinks.forEach(function(link){
+      var active = link.getAttribute('href') === '#' + id;
+      link.classList.toggle('active', active);
+      if (active){ link.setAttribute('aria-current', 'page'); }
+      else { link.removeAttribute('aria-current'); }
+    });
+  }
+  var sectionSpy = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){ if (entry.isIntersecting){ setActiveSection(entry.target.id); } });
+  }, {rootMargin:'-34% 0px -54% 0px', threshold:0});
+  sectionNames.forEach(function(id){ var section = document.getElementById(id); if(section){ sectionSpy.observe(section); } });
+
+  /* ---------- 英雄分类筛选 ---------- */
+  var filterBtns = document.querySelectorAll('#heroFilter button');
+  var heroCells = document.querySelectorAll('#heroGrid .hero-cell');
+  filterBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      filterBtns.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      filterBtns.forEach(function(b){ b.setAttribute('aria-pressed', String(b === btn)); });
+      var role = btn.getAttribute('data-role');
+      heroCells.forEach(function(cell){
+        var roles = cell.getAttribute('data-roles') || '';
+        if (role === 'all' || roles.indexOf(role) !== -1){
+          cell.classList.remove('hide');
+        } else {
+          cell.classList.add('hide');
+        }
+      });
+    });
+  });
+
+  /* ---------- 英雄画册：高精原画切换 ---------- */
+  var spotlight = document.getElementById('championSpotlight');
+  var spotlightImage = document.getElementById('spotlightImage');
+  var spotlightIndex = document.getElementById('spotlightIndex');
+  var spotlightName = document.getElementById('spotlightName');
+  var spotlightEnglish = document.getElementById('spotlightEnglish');
+  var spotlightRole = document.getElementById('spotlightRole');
+  var spotlightDesc = document.getElementById('spotlightDesc');
+  var spotlightTabs = Array.prototype.slice.call(document.querySelectorAll('#spotlightTabs .spotlight-tab'));
+  function selectSpotlight(tab, shouldFocus){
+    var index = spotlightTabs.indexOf(tab);
+    spotlightTabs.forEach(function(item){
+      var active = item === tab;
+      item.classList.toggle('active', active);
+      item.setAttribute('aria-selected', String(active));
+      item.setAttribute('tabindex', active ? '0' : '-1');
+    });
+    spotlight.classList.remove('is-swapping');
+    void spotlight.offsetWidth;
+    spotlight.classList.add('is-swapping');
+    spotlightImage.src = tab.getAttribute('data-image');
+    spotlightImage.alt = tab.getAttribute('data-name') + '原画';
+    spotlightIndex.textContent = String(index + 1).padStart(2, '0') + ' / ' + String(spotlightTabs.length).padStart(2, '0');
+    spotlightName.textContent = tab.getAttribute('data-name');
+    spotlightEnglish.textContent = tab.getAttribute('data-en');
+    spotlightRole.textContent = tab.getAttribute('data-role');
+    spotlightDesc.textContent = tab.getAttribute('data-desc');
+    if (shouldFocus){ tab.focus(); }
+  }
+  spotlightTabs.forEach(function(tab){
+    tab.addEventListener('click', function(){ selectSpotlight(tab, false); });
+    tab.addEventListener('keydown', function(e){
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft'){ return; }
+      e.preventDefault();
+      var direction = e.key === 'ArrowRight' ? 1 : -1;
+      var next = (spotlightTabs.indexOf(tab) + direction + spotlightTabs.length) % spotlightTabs.length;
+      selectSpotlight(spotlightTabs[next], true);
+    });
+  });
+
+  /* ---------- 功能画卷：按钮、拖动与可访问状态 ---------- */
+  var featureTrack = document.getElementById('featuresTrack');
+  var featureCards = Array.prototype.slice.call(featureTrack.querySelectorAll('.feature-card'));
+  var featurePrev = document.getElementById('featurePrev');
+  var featureNext = document.getElementById('featureNext');
+  var featureIndicator = document.getElementById('featureIndicator');
+  var currentFeature = 0;
+  function updateFeatureControl(){
+    var cardWidth = featureCards[0] ? featureCards[0].getBoundingClientRect().width + 18 : 1;
+    currentFeature = Math.max(0, Math.min(featureCards.length - 1, Math.round(featureTrack.scrollLeft / cardWidth)));
+    featureIndicator.textContent = String(currentFeature + 1).padStart(2, '0') + ' / ' + String(featureCards.length).padStart(2, '0');
+    featurePrev.disabled = currentFeature === 0;
+    featureNext.disabled = currentFeature === featureCards.length - 1;
+  }
+  function moveFeature(direction){
+    var target = Math.max(0, Math.min(featureCards.length - 1, currentFeature + direction));
+    featureCards[target].scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest', inline: 'start'});
+  }
+  featurePrev.addEventListener('click', function(){ moveFeature(-1); });
+  featureNext.addEventListener('click', function(){ moveFeature(1); });
+  featureTrack.addEventListener('scroll', updateFeatureControl, {passive:true});
+  window.addEventListener('resize', updateFeatureControl, {passive:true});
+  updateFeatureControl();
+
+  document.querySelectorAll('[data-toast]').forEach(function(el){
+    function handleToast(){ showToast(el.getAttribute('data-toast')); }
+    el.addEventListener('click', handleToast);
+    el.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); handleToast(); } });
+  });
+
+  document.querySelectorAll('[onclick]').forEach(function(el){
+    if (!el.hasAttribute('role')){ el.setAttribute('role', 'button'); }
+    if (!el.hasAttribute('tabindex')){ el.setAttribute('tabindex', '0'); }
+    el.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); el.click(); }
+    });
+  });
+
+  /* ---------- 滚动揭示 ---------- */
+  var revealObs = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if (en.isIntersecting){ en.target.classList.add('in'); revealObs.unobserve(en.target); }
+    });
+  }, {threshold:.15});
+  document.querySelectorAll('.reveal').forEach(function(el){ revealObs.observe(el); });
+
+  /* ---------- 开场（GSAP 可用时增强） ---------- */
+  if (reduceMotion || typeof gsap === 'undefined'){
+    preloader.style.display = 'none';
+    document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('in'); });
+    return;
+  }
+
+  var openTL = gsap.timeline({onComplete:function(){ gsap.set(preloader,{display:'none'}); }});
+  openTL
+    .to('#preSeal', {scale:1, opacity:1, duration:.55, ease:'expo.out'})
+    .to('#preLine', {opacity:1, duration:.5}, '-=.25')
+    .to('#preSub', {opacity:1, duration:.4}, '-=.2')
+    .to('#preSeal', {scale:1.06, duration:.18, yoyo:true, repeat:1, ease:'power2.out'}, '+=.15')
+    .to(preloader, {opacity:0, duration:.6, delay:.3});
+
+  gsap.from('.hero-copy > *', {y:44, opacity:0, duration:.95, stagger:.1, ease:'expo.out', delay:1.05});
+  gsap.from('.hero-dl', {y:30, opacity:0, duration:.8, ease:'expo.out', delay:1.4});
+})();
+</script>
+</body>
+</html>
