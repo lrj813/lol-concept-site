@@ -24,7 +24,6 @@ body{
   font-family:var(--sans); line-height:1.7;
   overflow-x:hidden; -webkit-font-smoothing:antialiased;
 }
-body.has-custom-cursor, body.has-custom-cursor *{cursor:none !important;}
 ::selection{background:var(--gold-deep); color:#fff;}
 a{color:inherit; text-decoration:none;}
 img{display:block; max-width:100%;}
@@ -83,10 +82,6 @@ header.nav.nav-hidden{opacity:0; pointer-events:none;}
 .hero-bg{position:absolute; inset:0; z-index:0;}
 .hero-bg img{width:100%; height:100%; object-fit:cover; object-position:center 62%; opacity:.85; filter:saturate(1.05) contrast(1.08); transform-origin:center 68%; animation:heroBreathe 10s cubic-bezier(.45,.05,.55,.95) infinite; will-change:transform,filter;}
 .hero-bg::before{content:''; position:absolute; inset:-4%; z-index:1; pointer-events:none; background:radial-gradient(ellipse at 54% 48%,rgba(232,201,135,.10),transparent 42%); mix-blend-mode:screen; animation:heroAura 10s ease-in-out infinite;}
-.hero-motion{position:absolute; inset:0; z-index:2; pointer-events:none; background-image:url('assets/hero-bg.jpg'); background-size:cover; background-position:center 62%; mix-blend-mode:screen; will-change:transform;}
-.hero-motion-left-hair{clip-path:polygon(0 0,35% 0,35% 44%,0 53%); opacity:.10; animation:detailHair 10s cubic-bezier(.45,.05,.55,.95) infinite;}
-.hero-motion-right-hair{clip-path:polygon(68% 0,100% 0,100% 58%,76% 48%); opacity:.12; animation:detailHair 10s cubic-bezier(.45,.05,.55,.95) -.35s infinite;}
-.hero-motion-right-cloth{clip-path:polygon(70% 32%,100% 28%,100% 100%,76% 100%); opacity:.055; animation:detailCloth 10s cubic-bezier(.45,.05,.55,.95) -.7s infinite;}
 .hero-char{position:absolute; z-index:1; pointer-events:none; mix-blend-mode:screen;}
 .hero-char img{height:100%; width:auto; object-fit:contain; display:block;}
 .hero-char-left{left:0; bottom:0; height:95vh; opacity:.65;}
@@ -120,8 +115,6 @@ header.nav.nav-hidden{opacity:0; pointer-events:none;}
 .hero-scroll .line{width:1px; height:46px; background:linear-gradient(var(--gold),transparent); animation:drop 2s infinite;}
 @keyframes heroBreathe{0%,100%{transform:scale(1) translate3d(0,0,0); filter:saturate(1.05) contrast(1.08);} 50%{transform:scale(1.028) translate3d(0,-.35%,0); filter:saturate(1.1) contrast(1.1) brightness(1.025);}}
 @keyframes heroAura{0%,100%{opacity:.35; transform:scale(.98);} 50%{opacity:.8; transform:scale(1.03);}}
-@keyframes detailHair{0%,100%{transform:translate3d(0,0,0) rotate(0deg) scale(1);} 50%{transform:translate3d(.18%,-.22%,0) rotate(-.16deg) scale(1.012);}}
-@keyframes detailCloth{0%,100%{transform:translate3d(0,0,0) skewX(0deg);} 50%{transform:translate3d(-.12%,-.1%,0) skewX(.22deg);}}
 
 
 @keyframes drop{0%{transform:scaleY(0); transform-origin:top;} 45%{transform:scaleY(1); transform-origin:top;}
@@ -264,18 +257,6 @@ footer{background:#080604; padding:70px 0 40px; border-top:1px solid rgba(201,16
   opacity:0; transition:opacity .35s, transform .35s; pointer-events:none;}
 #toast.show{opacity:1; transform:translate(-50%,0);}
 
-/* ============ 仙剑风格鼠标 ============ */
-.cursor-aura,.cursor-core,.cursor-rune{position:fixed; left:0; top:0; z-index:400; pointer-events:none; opacity:0;}
-.cursor-aura{width:76px; height:76px; margin:-38px 0 0 -38px; border:1px solid rgba(201,163,92,.24); border-radius:50%; background:radial-gradient(circle,rgba(201,163,92,.08),transparent 66%); mix-blend-mode:screen; transition:opacity .25s;}
-.cursor-aura::before,.cursor-aura::after{content:''; position:absolute; inset:10px; border:1px solid rgba(232,201,135,.28); border-radius:50%;}
-.cursor-aura::after{inset:25px; border-color:rgba(232,201,135,.5); transform:rotate(45deg); border-radius:2px;}
-.cursor-core{width:6px; height:6px; margin:-3px 0 0 -3px; border-radius:50%; background:var(--gold-bright); box-shadow:0 0 12px 3px rgba(232,201,135,.6); transition:opacity .15s, transform .18s;}
-.cursor-rune{width:14px; height:14px; margin:-7px 0 0 -7px; border:1px solid rgba(232,201,135,.7); transform:rotate(45deg); transition:opacity .2s;}
-body.has-custom-cursor .cursor-aura,body.has-custom-cursor .cursor-core,body.has-custom-cursor .cursor-rune{opacity:1;}
-body.has-custom-cursor.cursor-hover .cursor-aura{transform:scale(1.3); border-color:rgba(232,201,135,.55);}
-body.has-custom-cursor.cursor-hover .cursor-core{transform:scale(1.65);}
-@media(pointer:coarse){.cursor-aura,.cursor-core,.cursor-rune{display:none !important;}}
-
 /* ============ 响应式 ============ */
 @media (max-width:1024px){
   .hero-inner{grid-template-columns:1fr; gap:60px;}
@@ -301,8 +282,8 @@ body.has-custom-cursor.cursor-hover .cursor-core{transform:scale(1.65);}
   .nav-toggle.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
   .nav-toggle.open span:nth-child(2){opacity:0;}
   .nav-toggle.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
-  .hero{align-items:flex-start;}
-  .hero-inner{padding-top:128px !important; padding-bottom:80px; flex-direction:column; align-items:stretch;}
+  .hero{align-items:flex-start; min-height:auto;}
+  .hero-inner{padding-top:128px !important; padding-bottom:24px; flex-direction:column; align-items:stretch;}
   .hero h1{font-size:42px;}
   .hero-cta .btn-primary,.hero-cta .btn-ghost{width:100%; justify-content:center;}
   .feature-card{grid-template-columns:1fr; gap:30px; width:84vw; padding:38px 26px;}
@@ -315,9 +296,12 @@ body.has-custom-cursor.cursor-hover .cursor-core{transform:scale(1.65);}
   #featuresPin{overflow:visible;}
   .hero-grid{grid-template-columns:repeat(4,1fr); gap:10px;}
   .mf-grid{grid-template-columns:1fr;}
-  .hero-dl{justify-content:center; height:52px;}
+  .hero-dl{justify-content:center; align-self:center; width:100%; max-width:390px; min-height:58px; height:auto; padding:8px 12px; gap:10px;}
+  .hero-dl .dl-name{font-size:13px;}
+  .hero-dl .dl-sub{font-size:9px;}
   .hero-dl .dl-btn{padding:7px 14px; font-size:11px;}
-  .hero-motion{display:none;}
+  /* 让滚动提示参与正常文档流，避免与下载卡片重叠 */
+  .hero-scroll{position:relative; left:auto; bottom:auto; transform:none; margin:4px auto 30px;}
   .foot-grid{grid-template-columns:1fr; gap:36px;}
   .download-box{padding:40px 24px;}
 }
@@ -489,9 +473,6 @@ header.nav.nav-solid{background:rgba(9,7,5,.82) !important;border-bottom-color:r
 </svg>
 </head>
 <body>
-<div class="cursor-aura" id="cursorAura" aria-hidden="true"></div>
-<div class="cursor-rune" id="cursorRune" aria-hidden="true"></div>
-<div class="cursor-core" id="cursorCore" aria-hidden="true"></div>
 <div class="grain"></div>
 <nav class="section-rail" aria-label="章节导航">
   <a class="active" href="#home"><span>首页</span></a>
@@ -534,9 +515,6 @@ header.nav.nav-solid{background:rgba(9,7,5,.82) !important;border-bottom-color:r
   <div class="hero-bg">
     <img src="assets/hero-bg.jpg" alt="英雄联盟国风英雄场景">
   </div>
-  <div class="hero-motion hero-motion-left-hair" aria-hidden="true"></div>
-  <div class="hero-motion hero-motion-right-hair" aria-hidden="true"></div>
-  <div class="hero-motion hero-motion-right-cloth" aria-hidden="true"></div>
   <div class="cloud-pattern"></div>
   <div class="hero-vertical">懂联盟 · 更懂你的每一局</div>
   <div class="wrap hero-inner">
@@ -1233,32 +1211,6 @@ function showToast(msg){
     });
   }, {threshold:.15});
   document.querySelectorAll('.reveal').forEach(function(el){ revealObs.observe(el); });
-
-  /* ---------- 仙剑风格鼠标跟随 ---------- */
-  (function initCustomCursor(){
-    if (window.matchMedia('(pointer: coarse)').matches){ return; }
-    var aura = document.getElementById('cursorAura');
-    var rune = document.getElementById('cursorRune');
-    var core = document.getElementById('cursorCore');
-    if (!aura || !rune || !core){ return; }
-    document.body.classList.add('has-custom-cursor');
-    var mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
-    var auraX = mouseX, auraY = mouseY, runeX = mouseX, runeY = mouseY;
-    function moveCursor(){
-      auraX += (mouseX - auraX) * .12; auraY += (mouseY - auraY) * .12;
-      runeX += (mouseX - runeX) * .2; runeY += (mouseY - runeY) * .2;
-      aura.style.transform = 'translate3d(' + auraX + 'px,' + auraY + 'px,0)';
-      rune.style.transform = 'translate3d(' + runeX + 'px,' + runeY + 'px,0) rotate(45deg)';
-      core.style.transform = 'translate3d(' + mouseX + 'px,' + mouseY + 'px,0)';
-      requestAnimationFrame(moveCursor);
-    }
-    window.addEventListener('mousemove', function(e){ mouseX=e.clientX; mouseY=e.clientY; }, {passive:true});
-    document.querySelectorAll('a,button,.hero-cell,.spotlight-tab,.feature-card').forEach(function(el){
-      el.addEventListener('mouseenter', function(){ document.body.classList.add('cursor-hover'); });
-      el.addEventListener('mouseleave', function(){ document.body.classList.remove('cursor-hover'); });
-    });
-    moveCursor();
-  }());
 
   /* ---------- 开场（GSAP 可用时增强） ---------- */
   if (reduceMotion || typeof gsap === 'undefined'){
