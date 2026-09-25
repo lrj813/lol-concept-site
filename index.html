@@ -80,8 +80,7 @@ header.nav.nav-hidden{opacity:0; pointer-events:none;}
 /* ============ Hero 首屏 ============ */
 .hero{position:relative; min-height:100vh; display:flex; align-items:center; overflow:hidden;}
 .hero-bg{position:absolute; inset:0; z-index:0;}
-.hero-bg img{width:100%; height:100%; object-fit:cover; object-position:center 62%; opacity:.85; filter:saturate(1.05) contrast(1.08); transform-origin:center 68%; animation:heroBreathe 10s cubic-bezier(.45,.05,.55,.95) infinite; will-change:transform,filter;}
-.hero-bg::before{content:''; position:absolute; inset:-4%; z-index:1; pointer-events:none; background:radial-gradient(ellipse at 54% 48%,rgba(232,201,135,.10),transparent 42%); mix-blend-mode:screen; animation:heroAura 10s ease-in-out infinite;}
+.hero-bg img{width:100%; height:100%; object-fit:cover; object-position:center center; opacity:.85; filter:saturate(1.05) contrast(1.08); animation:heroBreathe 9s ease-in-out infinite;}
 .hero-char{position:absolute; z-index:1; pointer-events:none; mix-blend-mode:screen;}
 .hero-char img{height:100%; width:auto; object-fit:contain; display:block;}
 .hero-char-left{left:0; bottom:0; height:95vh; opacity:.65;}
@@ -113,8 +112,7 @@ header.nav.nav-hidden{opacity:0; pointer-events:none;}
 .hero-scroll{position:absolute; bottom:34px; left:50%; transform:translateX(-50%); z-index:3;
   font-size:11px; letter-spacing:.4em; color:var(--muted); display:flex; flex-direction:column; align-items:center; gap:10px;}
 .hero-scroll .line{width:1px; height:46px; background:linear-gradient(var(--gold),transparent); animation:drop 2s infinite;}
-@keyframes heroBreathe{0%,100%{transform:scale(1) translate3d(0,0,0); filter:saturate(1.05) contrast(1.08);} 50%{transform:scale(1.028) translate3d(0,-.35%,0); filter:saturate(1.1) contrast(1.1) brightness(1.025);}}
-@keyframes heroAura{0%,100%{opacity:.35; transform:scale(.98);} 50%{opacity:.8; transform:scale(1.03);}}
+@keyframes heroBreathe{0%,100%{transform:scale(1);} 50%{transform:scale(1.035);}}
 
 
 @keyframes drop{0%{transform:scaleY(0); transform-origin:top;} 45%{transform:scaleY(1); transform-origin:top;}
@@ -282,8 +280,8 @@ footer{background:#080604; padding:70px 0 40px; border-top:1px solid rgba(201,16
   .nav-toggle.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
   .nav-toggle.open span:nth-child(2){opacity:0;}
   .nav-toggle.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
-  .hero{align-items:flex-start; min-height:auto;}
-  .hero-inner{padding-top:128px !important; padding-bottom:24px; flex-direction:column; align-items:stretch;}
+  .hero{align-items:flex-start;}
+  .hero-inner{padding-top:128px !important; padding-bottom:80px; flex-direction:column; align-items:stretch;}
   .hero h1{font-size:42px;}
   .hero-cta .btn-primary,.hero-cta .btn-ghost{width:100%; justify-content:center;}
   .feature-card{grid-template-columns:1fr; gap:30px; width:84vw; padding:38px 26px;}
@@ -296,12 +294,8 @@ footer{background:#080604; padding:70px 0 40px; border-top:1px solid rgba(201,16
   #featuresPin{overflow:visible;}
   .hero-grid{grid-template-columns:repeat(4,1fr); gap:10px;}
   .mf-grid{grid-template-columns:1fr;}
-  .hero-dl{justify-content:center; align-self:center; width:100%; max-width:390px; min-height:58px; height:auto; padding:8px 12px; gap:10px;}
-  .hero-dl .dl-name{font-size:13px;}
-  .hero-dl .dl-sub{font-size:9px;}
+  .hero-dl{justify-content:center; height:52px;}
   .hero-dl .dl-btn{padding:7px 14px; font-size:11px;}
-  /* 让滚动提示参与正常文档流，避免与下载卡片重叠 */
-  .hero-scroll{position:relative; left:auto; bottom:auto; transform:none; margin:4px auto 30px;}
   .foot-grid{grid-template-columns:1fr; gap:36px;}
   .download-box{padding:40px 24px;}
 }
